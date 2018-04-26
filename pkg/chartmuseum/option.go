@@ -13,6 +13,7 @@ type (
 		url         string
 		username    string
 		password    string
+		accessToken string
 		contextPath string
 		timeout     time.Duration
 	}
@@ -36,6 +37,13 @@ func Username(username string) Option {
 func Password(password string) Option {
 	return func(opts *options) {
 		opts.password = password
+	}
+}
+
+// AccessToken is sent in the authorization header
+func AccessToken(accessToken string) Option {
+	return func(opts *options) {
+		opts.accessToken = accessToken
 	}
 }
 

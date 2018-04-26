@@ -58,6 +58,7 @@ Done.
 ```
 
 ## Authentication
+### Basic Auth
 If you have added your repo with the `--username`/`--password` flags (Helm 2.9+), or have added your repo with the basic auth username/password in the URL (e.g. `https://myuser:mypass@my.chart.repo.com`), no further setup is required.
 
 The plugin will use the auth info located in `~/.helm/repository/repositories.yaml` in order to authenticate.
@@ -70,3 +71,13 @@ $ export HELM_REPO_PASSWORD="mypass"
 
 With this setup, you can enable people to use your repo for installing charts etc. without allowing them to upload to it.
 
+### Token
+Although ChartMuseum server does not define or accept a token format (yet), if you are running it behind a proxy that accepts access tokens, you can provide the following env var:
+```
+$ export HELM_REPO_ACCESS_TOKEN="<token>"
+```
+
+This will result in all basic auth options above being ignored, and the plugin will send the token in the header:
+```
+Authorization: Bearer <token>
+```

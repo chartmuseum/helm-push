@@ -2,6 +2,7 @@ package chartmuseum
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -30,7 +31,9 @@ func (client *Client) UploadChartPackage(chartPackagePath string) (*http.Respons
 		return nil, err
 	}
 
-	if client.opts.username != "" && client.opts.password != "" {
+	if client.opts.accessToken != "" {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", client.opts.accessToken))
+	} else if client.opts.username != "" && client.opts.password != "" {
 		req.SetBasicAuth(client.opts.username, client.opts.password)
 	}
 
