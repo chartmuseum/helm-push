@@ -81,3 +81,16 @@ This will result in all basic auth options above being ignored, and the plugin w
 ```
 Authorization: Bearer <token>
 ```
+
+## Custom Downloader
+This plugin also defines the `cm://` protocol that you may specify when adding a repo:
+```
+$ helm repo add chartmuseum cm://my.chart.repo.com
+```
+
+The only real difference with this vs. simply using http/https, is that the environment variables above are recognized by the plugin and used to set the `Authorization` header appropriately. As in, if you do not add your repo in this way, you are unable to use token-based auth for GET requests (downloading index.yaml, chart .tgzs, etc).
+
+By default, `cm://` translates to `https://`. If you must use `http://`, you can set the following env var:
+```
+$ export HELM_REPO_USE_HTTP="true"
+```
