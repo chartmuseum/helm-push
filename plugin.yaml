@@ -3,6 +3,10 @@ version: "0.1.0"
 usage: "Please see https://github.com/chartmuseum/helm-push for usage"
 description: "Push chart package to ChartMuseum"
 command: "$HELM_PLUGIN_DIR/bin/helmpush"
+downloaders:
+- command: "bin/helmpush"
+  protocols:
+  - "cm"
 useTunnel: false
 hooks:
   install: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"

@@ -11,6 +11,9 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
+	"net/url"
+	"strconv"
 )
 
 type (
@@ -22,6 +25,7 @@ type (
 		password     string
 		accessToken  string
 		contextPath  string
+		useHTTP      bool
 	}
 )
 
@@ -37,28 +41,35 @@ Examples:
 )
 
 func newPushCmd(args []string) *cobra.Command {
-	push := &pushCmd{}
+	p := &pushCmd{}
 	cmd := &cobra.Command{
 		Use:          "helm push",
 		Short:        "Helm plugin to push chart package to ChartMuseum",
 		Long:         globalUsage,
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			// If there are 4 args, this is likely being used as a downloader for cm:// protocol
+			if len(args) == 4 && strings.HasPrefix(args[3], "cm://") {
+				p.setFieldsFromEnv()
+				return p.download(args[3])
+			}
+
 			if len(args) != 2 {
 				return errors.New("This command needs 2 arguments: name of chart, name of chart repository")
 			}
-			push.chartName = args[0]
-			push.repoName = args[1]
-			push.setFieldsFromEnv()
-			return push.run()
+			p.chartName = args[0]
+			p.repoName = args[1]
+			p.setFieldsFromEnv()
+			return p.push()
 		},
 	}
 	f := cmd.Flags()
-	f.StringVarP(&push.chartVersion, "version", "v", "", "Override chart version pre-push")
-	f.StringVarP(&push.username, "username", "u", "", "Override HTTP basic auth username [$HELM_REPO_USERNAME]")
-	f.StringVarP(&push.password, "password", "p", "", "Override HTTP basic auth password [$HELM_REPO_PASSWORD]")
-	f.StringVarP(&push.accessToken, "access-token", "", "", "Send token in authorization header [$HELM_REPO_ACCESS_TOKEN]")
-	f.StringVarP(&push.contextPath, "context-path", "", "", "ChartMuseum context path [$HELM_REPO_CONTEXT_PATH]")
+	f.StringVarP(&p.chartVersion, "version", "v", "", "Override chart version pre-push")
+	f.StringVarP(&p.username, "username", "u", "", "Override HTTP basic auth username [$HELM_REPO_USERNAME]")
+	f.StringVarP(&p.password, "password", "p", "", "Override HTTP basic auth password [$HELM_REPO_PASSWORD]")
+	f.StringVarP(&p.accessToken, "access-token", "", "", "Send token in authorization header [$HELM_REPO_ACCESS_TOKEN]")
+	f.StringVarP(&p.contextPath, "context-path", "", "", "ChartMuseum context path [$HELM_REPO_CONTEXT_PATH]")
 	f.Parse(args)
 	return cmd
 }
@@ -76,9 +87,12 @@ func (p *pushCmd) setFieldsFromEnv() {
 	if v, ok := os.LookupEnv("HELM_REPO_CONTEXT_PATH"); ok && p.contextPath == "" {
 		p.contextPath = v
 	}
+	if v, ok := os.LookupEnv("HELM_REPO_USE_HTTP"); ok {
+		p.useHTTP, _ = strconv.ParseBool(v)
+	}
 }
 
-func (p *pushCmd) run() error {
+func (p *pushCmd) push() error {
 	repo, err := helm.GetRepoByName(p.repoName)
 	if err != nil {
 		return err
@@ -130,6 +144,54 @@ func (p *pushCmd) run() error {
 	}
 
 	return handlePushResponse(resp)
+}
+
+func (p *pushCmd) download(fileURL string) error {
+	fmt.Println(fileURL)
+	parsedURL, err := url.Parse(fileURL)
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(parsedURL.Path)
+	parts := strings.Split(parsedURL.Path, "/")
+	numParts := len(parts)
+	if numParts <= 1 {
+		return fmt.Errorf("invalid file url: %s", fileURL)
+	}
+
+	fmt.Println(parts)
+	filePath := parts[numParts-1]
+
+	numRemoveParts := 1
+	if parts[numParts-2] == "charts" {
+		numRemoveParts++
+		filePath = "charts/" + filePath
+	}
+
+	parsedURL.Path = strings.Join(parts[:numParts - numRemoveParts], "/")
+
+	if p.useHTTP {
+		parsedURL.Scheme = "http"
+	} else {
+		parsedURL.Scheme = "https"
+	}
+
+	client := cm.NewClient(
+		cm.URL(parsedURL.String()),
+		cm.Username(p.username),
+		cm.Password(p.password),
+		cm.AccessToken(p.accessToken),
+		cm.ContextPath(p.contextPath),
+	)
+
+	contents, err := client.DownloadFile(filePath)
+	if err != nil {
+		return err
+	}
+
+	fmt.Print(string(contents))
+	return nil
 }
 
 func handlePushResponse(resp *http.Response) error {

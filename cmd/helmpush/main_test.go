@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -83,7 +84,7 @@ func TestPushCmd(t *testing.T) {
 	cmd = newPushCmd(args)
 	err = cmd.RunE(cmd, args)
 	if err != nil {
-		t.Error("unexpecting errpr uploading tarball", err)
+		t.Error("unexpecting error uploading tarball", err)
 	}
 
 	// Trigger 409
@@ -104,5 +105,33 @@ func TestPushCmd(t *testing.T) {
 	err = cmd.RunE(cmd, args)
 	if err == nil {
 		t.Error("expecting error with bad response body, instead got nil")
+	}
+
+	// cm:// downloader
+	os.Setenv("HELM_REPO_USE_HTTP", "true")
+	downloaderBaseURL := strings.Replace(ts.URL, "http://", "cm://", 1)
+
+	// fails with no file path
+	args = []string{"", "", "", downloaderBaseURL}
+	cmd = newPushCmd(args)
+	err = cmd.RunE(cmd, args)
+	if err == nil {
+		t.Error("expecting error with bad cm:// url, instead got nil")
+	}
+
+	// index.yaml
+	args = []string{"", "", "", downloaderBaseURL+"/index.yaml"}
+	cmd = newPushCmd(args)
+	err = cmd.RunE(cmd, args)
+	if err != nil {
+		t.Error("unexpecting error trying to download index.yaml", err)
+	}
+
+	// charts/mychart-0.1.0.tgz
+	args = []string{"", "", "", downloaderBaseURL+"/charts/mychart-0.1.0.tgz"}
+	cmd = newPushCmd(args)
+	err = cmd.RunE(cmd, args)
+	if err != nil {
+		t.Error("unexpecting error trying to download charts/mychart-0.1.0.tgz", err)
 	}
 }
