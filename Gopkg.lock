@@ -113,12 +113,12 @@
     "pkg/urlutil",
     "pkg/version"
   ]
-  revision = "60abcdca41f544caaecb224acbfb92aee11e1f6e"
-  version = "v2.9.0-rc3"
+  revision = "f6025bb9ee7daf9fee0026541c90a6f557a3e0bc"
+  version = "v2.9.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "bd09ab49283cd57bd38d1e1f45ee8e2da5fb851f749a7dfc9178f135e548480d"
+  inputs-digest = "293f401d14e15940cc5e06b98e5db9110c0cd0316e803d0dbc15a774fc49c868"
   solver-name = "gps-cdcl"
   solver-version = 1
