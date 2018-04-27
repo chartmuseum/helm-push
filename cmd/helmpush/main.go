@@ -118,8 +118,16 @@ func (p *pushCmd) push() error {
 		password = p.password
 	}
 
+	// in case the repo is stored with cm:// protocol, remove it
+	var url string
+	if p.useHTTP {
+		url = strings.Replace(repo.URL, "cm://", "http://", 1)
+	} else {
+		url = strings.Replace(repo.URL, "cm://", "https://", 1)
+	}
+
 	client := cm.NewClient(
-		cm.URL(repo.URL),
+		cm.URL(url),
 		cm.Username(username),
 		cm.Password(password),
 		cm.AccessToken(p.accessToken),
