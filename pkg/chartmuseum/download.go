@@ -6,11 +6,10 @@ import (
 	"net/url"
 	"path"
 	"strings"
-	"io/ioutil"
 )
 
 // DownloadFile downloads a file from ChartMuseum
-func (client *Client) DownloadFile(filePath string) ([]byte, error) {
+func (client *Client) DownloadFile(filePath string) (*http.Response, error) {
 	u, err := url.Parse(client.opts.url)
 	if err != nil {
 		return nil, err
@@ -28,10 +27,5 @@ func (client *Client) DownloadFile(filePath string) ([]byte, error) {
 		req.SetBasicAuth(client.opts.username, client.opts.password)
 	}
 
-	res, err := client.Do(req)
-	if err != nil {
-		return nil, err
-	}
-
-	return ioutil.ReadAll(res.Body)
+	return client.Do(req)
 }

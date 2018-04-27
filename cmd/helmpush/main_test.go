@@ -108,6 +108,7 @@ func TestPushCmd(t *testing.T) {
 	}
 
 	// cm:// downloader
+	statusCode = 200
 	os.Setenv("HELM_REPO_USE_HTTP", "true")
 	downloaderBaseURL := strings.Replace(ts.URL, "http://", "cm://", 1)
 
@@ -124,7 +125,7 @@ func TestPushCmd(t *testing.T) {
 	cmd = newPushCmd(args)
 	err = cmd.RunE(cmd, args)
 	if err != nil {
-		t.Error("unexpecting error trying to download index.yaml", err)
+		t.Error("unexpected error trying to download index.yaml", err)
 	}
 
 	// charts/mychart-0.1.0.tgz
@@ -132,6 +133,6 @@ func TestPushCmd(t *testing.T) {
 	cmd = newPushCmd(args)
 	err = cmd.RunE(cmd, args)
 	if err != nil {
-		t.Error("unexpecting error trying to download charts/mychart-0.1.0.tgz", err)
+		t.Error("unexpected error trying to download charts/mychart-0.1.0.tgz", err)
 	}
 }

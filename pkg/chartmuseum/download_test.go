@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"net/http/httptest"
 	"net/http"
+	"io/ioutil"
 )
 
 func TestDownloadFile(t *testing.T) {
@@ -25,11 +26,15 @@ func TestDownloadFile(t *testing.T) {
 		Password("pass"),
 	)
 
-	content, err := cmClient.DownloadFile("testfile")
+	resp, err := cmClient.DownloadFile("testfile")
 	if err != nil {
 		t.Error("error downloading testfile", err)
 	}
-	if s := string(content); s != "hello world" {
+	b, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
+		t.Error("error reading response body", err)
+	}
+	if s := string(b); s != "hello world" {
 		t.Error("testfile contents were incorrect", s)
 	}
 

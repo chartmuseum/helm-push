@@ -9,11 +9,11 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"net/http"
+	"net/url"
 	"os"
 	"path/filepath"
-	"strings"
-	"net/url"
 	"strconv"
+	"strings"
 )
 
 type (
@@ -147,20 +147,17 @@ func (p *pushCmd) push() error {
 }
 
 func (p *pushCmd) download(fileURL string) error {
-	fmt.Println(fileURL)
 	parsedURL, err := url.Parse(fileURL)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(parsedURL.Path)
 	parts := strings.Split(parsedURL.Path, "/")
 	numParts := len(parts)
 	if numParts <= 1 {
 		return fmt.Errorf("invalid file url: %s", fileURL)
 	}
 
-	fmt.Println(parts)
 	filePath := parts[numParts-1]
 
 	numRemoveParts := 1
@@ -169,7 +166,7 @@ func (p *pushCmd) download(fileURL string) error {
 		filePath = "charts/" + filePath
 	}
 
-	parsedURL.Path = strings.Join(parts[:numParts - numRemoveParts], "/")
+	parsedURL.Path = strings.Join(parts[:numParts-numRemoveParts], "/")
 
 	if p.useHTTP {
 		parsedURL.Scheme = "http"
@@ -185,33 +182,48 @@ func (p *pushCmd) download(fileURL string) error {
 		cm.ContextPath(p.contextPath),
 	)
 
-	contents, err := client.DownloadFile(filePath)
+	resp, err := client.DownloadFile(filePath)
 	if err != nil {
 		return err
 	}
 
-	fmt.Print(string(contents))
-	return nil
+	return handleDownloadResponse(resp)
 }
 
 func handlePushResponse(resp *http.Response) error {
 	if resp.StatusCode != 201 {
 		b, err := ioutil.ReadAll(resp.Body)
-		defer resp.Body.Close()
 		if err != nil {
 			return err
 		}
-		var er struct {
-			Error string `json:"error"`
-		}
-		err = json.Unmarshal(b, &er)
-		if err != nil || er.Error == "" {
-			return fmt.Errorf("%d: could not properly parse response JSON: %s", resp.StatusCode, string(b))
-		}
-		return fmt.Errorf("%d: %s", resp.StatusCode, er.Error)
+		return getChartmuseumError(b, resp.StatusCode)
 	}
 	fmt.Println("Done.")
 	return nil
+}
+
+func handleDownloadResponse(resp *http.Response) error {
+	b, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode != 200 {
+		return getChartmuseumError(b, resp.StatusCode)
+	}
+	fmt.Print(string(b))
+	return nil
+}
+
+func getChartmuseumError(b []byte, code int) error {
+	var er struct {
+		Error string `json:"error"`
+	}
+	err := json.Unmarshal(b, &er)
+	if err != nil || er.Error == "" {
+		return fmt.Errorf("%d: could not properly parse response JSON: %s", code, string(b))
+	}
+	return fmt.Errorf("%d: %s", code, er.Error)
 }
 
 func main() {
