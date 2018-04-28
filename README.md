@@ -82,6 +82,17 @@ This will result in all basic auth options above being ignored, and the plugin w
 Authorization: Bearer <token>
 ```
 
+If you require a custom header to be used for passing the token, you can the following env var:
+```
+$ export HELM_REPO_AUTH_HEADER="<myheader>"
+```
+
+This will then be used in place of `Authorization: Bearer`:
+```
+<myheader>: <token>
+```
+
+
 ## Custom Downloader
 This plugin also defines the `cm://` protocol that you may specify when adding a repo:
 ```
