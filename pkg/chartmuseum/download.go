@@ -22,7 +22,11 @@ func (client *Client) DownloadFile(filePath string) (*http.Response, error) {
 	}
 
 	if client.opts.accessToken != "" {
-		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", client.opts.accessToken))
+		if client.opts.authHeader != "" {
+			req.Header.Set(client.opts.authHeader, client.opts.accessToken)
+		} else {
+			req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", client.opts.accessToken))
+		}
 	} else if client.opts.username != "" && client.opts.password != "" {
 		req.SetBasicAuth(client.opts.username, client.opts.password)
 	}

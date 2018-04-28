@@ -24,6 +24,7 @@ type (
 		username     string
 		password     string
 		accessToken  string
+		authHeader   string
 		contextPath  string
 		useHTTP      bool
 	}
@@ -68,7 +69,8 @@ func newPushCmd(args []string) *cobra.Command {
 	f.StringVarP(&p.chartVersion, "version", "v", "", "Override chart version pre-push")
 	f.StringVarP(&p.username, "username", "u", "", "Override HTTP basic auth username [$HELM_REPO_USERNAME]")
 	f.StringVarP(&p.password, "password", "p", "", "Override HTTP basic auth password [$HELM_REPO_PASSWORD]")
-	f.StringVarP(&p.accessToken, "access-token", "", "", "Send token in authorization header [$HELM_REPO_ACCESS_TOKEN]")
+	f.StringVarP(&p.accessToken, "access-token", "", "", "Send token in Authorization header [$HELM_REPO_ACCESS_TOKEN]")
+	f.StringVarP(&p.authHeader, "auth-header", "", "", "Alternative header to use for token auth [$HELM_REPO_AUTH_HEADER]")
 	f.StringVarP(&p.contextPath, "context-path", "", "", "ChartMuseum context path [$HELM_REPO_CONTEXT_PATH]")
 	f.Parse(args)
 	return cmd
@@ -83,6 +85,9 @@ func (p *pushCmd) setFieldsFromEnv() {
 	}
 	if v, ok := os.LookupEnv("HELM_REPO_ACCESS_TOKEN"); ok && p.accessToken == "" {
 		p.accessToken = v
+	}
+	if v, ok := os.LookupEnv("HELM_REPO_AUTH_HEADER"); ok && p.authHeader == "" {
+		p.authHeader = v
 	}
 	if v, ok := os.LookupEnv("HELM_REPO_CONTEXT_PATH"); ok && p.contextPath == "" {
 		p.contextPath = v
@@ -131,6 +136,7 @@ func (p *pushCmd) push() error {
 		cm.Username(username),
 		cm.Password(password),
 		cm.AccessToken(p.accessToken),
+		cm.AuthHeader(p.authHeader),
 		cm.ContextPath(p.contextPath),
 	)
 
@@ -187,6 +193,7 @@ func (p *pushCmd) download(fileURL string) error {
 		cm.Username(p.username),
 		cm.Password(p.password),
 		cm.AccessToken(p.accessToken),
+		cm.AuthHeader(p.authHeader),
 		cm.ContextPath(p.contextPath),
 	)
 

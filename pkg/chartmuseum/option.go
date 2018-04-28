@@ -14,6 +14,7 @@ type (
 		username    string
 		password    string
 		accessToken string
+		authHeader  string
 		contextPath string
 		timeout     time.Duration
 	}
@@ -44,6 +45,13 @@ func Password(password string) Option {
 func AccessToken(accessToken string) Option {
 	return func(opts *options) {
 		opts.accessToken = accessToken
+	}
+}
+
+// AuthHeader is an alternative header to use for token auth
+func AuthHeader(authHeader string) Option {
+	return func(opts *options) {
+		opts.authHeader = authHeader
 	}
 }
 
