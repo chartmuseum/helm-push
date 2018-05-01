@@ -6,11 +6,14 @@ import (
 	"fmt"
 	cm "github.com/chartmuseum/helm-push/pkg/chartmuseum"
 	"github.com/chartmuseum/helm-push/pkg/helm"
+	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
+	"os/user"
+	"path"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -27,6 +30,16 @@ type (
 		authHeader   string
 		contextPath  string
 		useHTTP      bool
+	}
+
+	config struct {
+		CurrentContext string             `json:"current-context"`
+		Contexts       map[string]context `json:"contexts"`
+	}
+
+	context struct {
+		Name  string `json:"name"`
+		Token string `json:"token"`
 	}
 )
 
@@ -94,6 +107,35 @@ func (p *pushCmd) setFieldsFromEnv() {
 	}
 	if v, ok := os.LookupEnv("HELM_REPO_USE_HTTP"); ok {
 		p.useHTTP, _ = strconv.ParseBool(v)
+	}
+
+	if p.accessToken == "" {
+		p.setAccessTokenFromConfigFile()
+	}
+}
+
+func (p *pushCmd) setAccessTokenFromConfigFile() {
+	usr, err := user.Current()
+	if err != nil {
+		return
+	}
+	configPath := path.Join(usr.HomeDir, ".cfconfig")
+	if _, err := os.Stat(configPath); os.IsNotExist(err) {
+		return
+	}
+	var c config
+	yamlFile, err := ioutil.ReadFile(configPath)
+	if err != nil {
+		return
+	}
+	if err = yaml.Unmarshal(yamlFile, &c); err != nil {
+		return
+	}
+	for _, context := range c.Contexts {
+		if context.Name == c.CurrentContext {
+			p.accessToken = context.Token
+			break
+		}
 	}
 }
 
