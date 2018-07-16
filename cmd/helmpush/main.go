@@ -15,6 +15,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 )
@@ -51,6 +52,7 @@ Examples:
   $ helm push mychart-0.1.0.tgz chartmuseum       # push .tgz from "helm package"
   $ helm push . chartmuseum                       # package and push chart directory
   $ helm push . --version="7c4d121" chartmuseum   # override version in Chart.yaml
+  $ helm push . https://my.chart.repo.com         # push directly to chart repo URL
 `
 )
 
@@ -70,7 +72,7 @@ func newPushCmd(args []string) *cobra.Command {
 			}
 
 			if len(args) != 2 {
-				return errors.New("This command needs 2 arguments: name of chart, name of chart repository")
+				return errors.New("This command needs 2 arguments: name of chart, name of chart repository (or repo URL)")
 			}
 			p.chartName = args[0]
 			p.repoName = args[1]
@@ -140,7 +142,18 @@ func (p *pushCmd) setAccessTokenFromConfigFile() {
 }
 
 func (p *pushCmd) push() error {
-	repo, err := helm.GetRepoByName(p.repoName)
+	var repo *helm.Repo
+	var err error
+
+	// If the argument looks like a URL, just create a temp repo object
+	// instead of looking for the entry in the local repository list
+	if regexp.MustCompile(`^https?://`).MatchString(p.repoName) {
+		repo, err = helm.TempRepoFromURL(p.repoName)
+		p.repoName = repo.URL
+	} else {
+		repo, err = helm.GetRepoByName(p.repoName)
+	}
+
 	if err != nil {
 		return err
 	}

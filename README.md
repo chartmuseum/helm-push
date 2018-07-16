@@ -16,7 +16,7 @@ Installed plugin: push
 ```
 
 ## Usage
-You must start by adding a ChartMuseum-backed repo via Helm CLI (if not already added)
+Start by adding a ChartMuseum-backed repo via Helm CLI (if not already added)
 ```
 $ helm repo add chartmuseum http://localhost:8080
 ```
@@ -54,6 +54,14 @@ This workflow does not require the use of `helm package`, but pushing .tgzs is s
 ```
 $ helm push mychart-0.3.2.tgz chartmuseum
 Pushing mychart-0.3.2.tgz to chartmuseum...
+Done.
+```
+
+### Pushing directly to URL
+If the second argument provided resembles a URL, you are not required to add the repo prior to push:
+```
+$ helm push mychart-0.3.2.tgz http://localhost:8080
+Pushing mychart-0.3.2.tgz to http://localhost:8080...
 Done.
 ```
 

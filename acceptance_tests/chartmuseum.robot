@@ -9,28 +9,60 @@ Suite Teardown    Suite Teardown
 
 *** Test Cases ***
 Chart directory can be pushed to ChartMuseum
+    # Repo name
     push chart directory
     HelmPush.return code should be   0
     package exists in chartmuseum storage
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
+    # Repo URL
+    push chart directory to url
+    HelmPush.return code should be   0
+    package exists in chartmuseum storage
+    ChartMuseum.return code should be   0
+    clear chartmuseum storage
+
 Chart directory can be pushed to ChartMuseum with custom version
+    # Repo name
     push chart directory    latest
     HelmPush.return code should be   0
     package exists in chartmuseum storage   latest
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
+    # Repo URL
+    push chart directory to url    latest
+    HelmPush.return code should be   0
+    package exists in chartmuseum storage   latest
+    ChartMuseum.return code should be   0
+    clear chartmuseum storage
+
 Chart package can be pushed to ChartMuseum
+    # Repo name
     push chart package
     HelmPush.return code should be   0
     package exists in chartmuseum storage
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
+    # Repo URL
+    push chart package to url
+    HelmPush.return code should be   0
+    package exists in chartmuseum storage
+    ChartMuseum.return code should be   0
+    clear chartmuseum storage
+
 Chart package can be pushed to ChartMuseum with custom version
+    # Repo name
     push chart package  latest
+    HelmPush.return code should be   0
+    package exists in chartmuseum storage   latest
+    ChartMuseum.return code should be   0
+    clear chartmuseum storage
+
+    # Repo URL
+    push chart package to url  latest
     HelmPush.return code should be   0
     package exists in chartmuseum storage   latest
     ChartMuseum.return code should be   0

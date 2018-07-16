@@ -60,3 +60,29 @@ func TestGetRepoByName(t *testing.T) {
 	}
 
 }
+
+func TestTempRepoFromURL(t *testing.T) {
+	url := "https://my.chart.repo.com"
+	repo, err := TempRepoFromURL(url)
+	if err != nil {
+		t.Error("unexpected error getting temp repo from URL", err)
+	}
+	if repo.URL != url {
+		t.Error("expecting repo URL to match what was provided")
+	}
+
+	url = "https://user:p@ss@my.chart.repo.com/a/b/c/"
+	repo, err = TempRepoFromURL(url)
+	if err != nil {
+		t.Error("unexpected error getting temp repo from URL, with basic auth", err)
+	}
+	if repo.URL != "https://my.chart.repo.com/a/b/c/" {
+		t.Error("expecting repo URL to have basic auth removed")
+	}
+	if repo.Username != "user" {
+		t.Error("expecting repo username to be extracted from URL")
+	}
+	if repo.Password != "p@ss" {
+		t.Error("expecting repo password to be extracted from URL")
+	}
+}
