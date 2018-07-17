@@ -11,9 +11,9 @@ version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
 echo "Downloading and installing helm-push v${version} ..."
 
 url=""
-if [ "$(uname)" == "Darwin" ]; then
+if [ "$(uname)" = "Darwin" ]; then
     url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_darwin_amd64.tar.gz"
-elif [ "$(uname)" == "Linux" ] ; then
+elif [ "$(uname)" = "Linux" ] ; then
     url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_linux_amd64.tar.gz"
 else
     url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_windows_amd64.tar.gz"
