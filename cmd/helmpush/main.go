@@ -30,6 +30,7 @@ type (
 		accessToken  string
 		authHeader   string
 		contextPath  string
+		forceUpload  bool
 		useHTTP      bool
 	}
 
@@ -87,6 +88,7 @@ func newPushCmd(args []string) *cobra.Command {
 	f.StringVarP(&p.accessToken, "access-token", "", "", "Send token in Authorization header [$HELM_REPO_ACCESS_TOKEN]")
 	f.StringVarP(&p.authHeader, "auth-header", "", "", "Alternative header to use for token auth [$HELM_REPO_AUTH_HEADER]")
 	f.StringVarP(&p.contextPath, "context-path", "", "", "ChartMuseum context path [$HELM_REPO_CONTEXT_PATH]")
+	f.BoolVarP(&p.forceUpload, "force", "f", false, "Force upload even if chart version exists")
 	f.Parse(args)
 	return cmd
 }
@@ -207,7 +209,7 @@ func (p *pushCmd) push() error {
 	}
 
 	fmt.Printf("Pushing %s to %s...\n", filepath.Base(chartPackagePath), p.repoName)
-	resp, err := client.UploadChartPackage(chartPackagePath)
+	resp, err := client.UploadChartPackage(chartPackagePath, p.forceUpload)
 	if err != nil {
 		return err
 	}

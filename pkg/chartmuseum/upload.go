@@ -14,7 +14,7 @@ import (
 )
 
 // UploadChartPackage uploads a chart package to ChartMuseum (POST /api/charts)
-func (client *Client) UploadChartPackage(chartPackagePath string) (*http.Response, error) {
+func (client *Client) UploadChartPackage(chartPackagePath string, force bool) (*http.Response, error) {
 	u, err := url.Parse(client.opts.url)
 	if err != nil {
 		return nil, err
@@ -24,6 +24,11 @@ func (client *Client) UploadChartPackage(chartPackagePath string) (*http.Respons
 	req, err := http.NewRequest("POST", u.String(), nil)
 	if err != nil {
 		return nil, err
+	}
+
+	// Add ?force to request querystring to force an upload if chart version already exists
+	if force {
+		req.URL.RawQuery = "force"
 	}
 
 	err = setUploadChartPackageRequestBody(req, chartPackagePath)

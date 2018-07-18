@@ -57,6 +57,16 @@ Pushing mychart-0.3.2.tgz to chartmuseum...
 Done.
 ```
 
+### Force push
+If your ChartMuseum install is configured with `ALLOW_OVERWRITE=true`, chart versions will be automatically overwritten upon re-upload.
+
+Otherwise, unless your install is configured with `DISABLE_FORCE_OVERWRITE=true`, you can use the `--force`/`-f` option to to force an upload:
+```
+$ helm push --force mychart-0.3.2.tgz chartmuseum
+Pushing mychart-0.3.2.tgz to chartmuseum...
+Done.
+```
+
 ### Pushing directly to URL
 If the second argument provided resembles a URL, you are not required to add the repo prior to push:
 ```
