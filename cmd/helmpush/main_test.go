@@ -1,21 +1,31 @@
 package main
 
 import (
+	"crypto/rand"
+	"crypto/tls"
 	"io/ioutil"
-	"k8s.io/helm/pkg/getter"
-	helm_env "k8s.io/helm/pkg/helm/environment"
-	"k8s.io/helm/pkg/helm/helmpath"
-	"k8s.io/helm/pkg/repo"
 	"net/http"
 	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
+
+	"k8s.io/helm/pkg/getter"
+	helm_env "k8s.io/helm/pkg/helm/environment"
+	"k8s.io/helm/pkg/helm/helmpath"
+	"k8s.io/helm/pkg/repo"
+	"k8s.io/helm/pkg/tlsutil"
 )
 
 var (
-	settings        helm_env.EnvSettings
-	testTarballPath = "../../testdata/charts/mychart/mychart-0.1.0.tgz"
+	settings           helm_env.EnvSettings
+	testTarballPath    = "../../testdata/charts/mychart/mychart-0.1.0.tgz"
+	testCertPath       = "../../testdata/tls/test_cert.crt"
+	testKeyPath        = "../../testdata/tls/test_key.key"
+	testCAPath         = "../../testdata/tls/ca.crt"
+	testServerCAPath   = "../../testdata/tls/server_ca.crt"
+	testServerCertPath = "../../testdata/tls/test_server.crt"
+	testServerKeyPath  = "../../testdata/tls/test_server.key"
 )
 
 func TestPushCmd(t *testing.T) {
@@ -121,7 +131,7 @@ func TestPushCmd(t *testing.T) {
 	}
 
 	// index.yaml
-	args = []string{"", "", "", downloaderBaseURL+"/index.yaml"}
+	args = []string{"", "", "", downloaderBaseURL + "/index.yaml"}
 	cmd = newPushCmd(args)
 	err = cmd.RunE(cmd, args)
 	if err != nil {
@@ -129,10 +139,82 @@ func TestPushCmd(t *testing.T) {
 	}
 
 	// charts/mychart-0.1.0.tgz
-	args = []string{"", "", "", downloaderBaseURL+"/charts/mychart-0.1.0.tgz"}
+	args = []string{"", "", "", downloaderBaseURL + "/charts/mychart-0.1.0.tgz"}
 	cmd = newPushCmd(args)
 	err = cmd.RunE(cmd, args)
 	if err != nil {
 		t.Error("unexpected error trying to download charts/mychart-0.1.0.tgz", err)
+	}
+}
+
+func TestPushCmdWithTlsEnabledServer(t *testing.T) {
+	statusCode := 201
+	body := "{\"success\": true}"
+	ts := httptest.NewUnstartedServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(statusCode)
+		w.Write([]byte(body))
+	}))
+	cert, err := tls.LoadX509KeyPair(testCertPath, testKeyPath)
+	if err != nil {
+		t.Fatalf("failed to load certificate and key with error: %s", err.Error())
+	}
+
+	caCertPool, err := tlsutil.CertPoolFromFile(testServerCAPath)
+	if err != nil {
+		t.Fatalf("load server CA file failed with error: %s", err.Error())
+	}
+
+	ts.TLS = &tls.Config{
+		ClientCAs:    caCertPool,
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		Certificates: []tls.Certificate{cert},
+		Rand:         rand.Reader,
+	}
+	ts.StartTLS()
+	defer ts.Close()
+
+	// Create new Helm home w/ test repo
+	tmp, err := ioutil.TempDir("", "helm-push-test")
+	if err != nil {
+		t.Error("unexpected error creating temp test dir", err)
+	}
+	defer os.RemoveAll(tmp)
+
+	home := helmpath.Home(tmp)
+	f := repo.NewRepoFile()
+
+	entry := repo.Entry{}
+	entry.Name = "helm-push-test"
+	entry.URL = ts.URL
+
+	_, err = repo.NewChartRepository(&entry, getter.All(settings))
+	if err != nil {
+		t.Error("unexpected error created test repository", err)
+	}
+
+	f.Update(&entry)
+	os.MkdirAll(home.Repository(), 0777)
+	f.WriteFile(home.RepositoryFile(), 0644)
+
+	os.Setenv("HELM_HOME", home.String())
+	os.Setenv("HELM_REPO_USERNAME", "myuser")
+	os.Setenv("HELM_REPO_PASSWORD", "mypass")
+	os.Setenv("HELM_REPO_CONTEXT_PATH", "/x/y/z")
+
+	//no certificate options
+	args := []string{testTarballPath, "helm-push-test"}
+	cmd := newPushCmd(args)
+	err = cmd.RunE(cmd, args)
+	if err == nil {
+		t.Fatal("expected non nil error but got nil when run cmd without certificate option")
+	}
+
+	os.Setenv("HELM_REPO_CA_FILE", testCAPath)
+	os.Setenv("HELM_REPO_CERT_FILE", testServerCertPath)
+	os.Setenv("HELM_REPO_KEY_FILE", testServerKeyPath)
+
+	err = cmd.RunE(cmd, args)
+	if err != nil {
+		t.Fatalf("unexpecting error uploading tarball: %s", err)
 	}
 }

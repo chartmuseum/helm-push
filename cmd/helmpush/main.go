@@ -4,10 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	cm "github.com/chartmuseum/helm-push/pkg/chartmuseum"
-	"github.com/chartmuseum/helm-push/pkg/helm"
-	"github.com/ghodss/yaml"
-	"github.com/spf13/cobra"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -17,19 +13,28 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+
+	cm "github.com/chartmuseum/helm-push/pkg/chartmuseum"
+	"github.com/chartmuseum/helm-push/pkg/helm"
+	"github.com/ghodss/yaml"
+	"github.com/spf13/cobra"
 )
 
 type (
 	pushCmd struct {
-		chartName    string
-		chartVersion string
-		repoName     string
-		username     string
-		password     string
-		accessToken  string
-		authHeader   string
-		contextPath  string
-		useHTTP      bool
+		chartName          string
+		chartVersion       string
+		repoName           string
+		username           string
+		password           string
+		accessToken        string
+		authHeader         string
+		contextPath        string
+		useHTTP            bool
+		caFile             string
+		certFile           string
+		keyFile            string
+		InsecureSkipVerify bool
 	}
 
 	config struct {
@@ -85,6 +90,11 @@ func newPushCmd(args []string) *cobra.Command {
 	f.StringVarP(&p.accessToken, "access-token", "", "", "Send token in Authorization header [$HELM_REPO_ACCESS_TOKEN]")
 	f.StringVarP(&p.authHeader, "auth-header", "", "", "Alternative header to use for token auth [$HELM_REPO_AUTH_HEADER]")
 	f.StringVarP(&p.contextPath, "context-path", "", "", "ChartMuseum context path [$HELM_REPO_CONTEXT_PATH]")
+	//Appended for supporting https with certificates
+	f.StringVarP(&p.caFile, "ca-file", "", "", "Verify certificates of HTTPS-enabled servers using this CA bundle [$HELM_REPO_CA_FILE]")
+	f.StringVarP(&p.certFile, "cert-file", "", "", "Identify HTTPS client using this SSL certificate file [$HELM_REPO_CERT_FILE]")
+	f.StringVarP(&p.keyFile, "key-file", "", "", "Identify HTTPS client using this SSL key file [$HELM_REPO_KEY_FILE]")
+	f.BoolVarP(&p.InsecureSkipVerify, "insecure", "", false, "Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]")
 	f.Parse(args)
 	return cmd
 }
@@ -107,6 +117,20 @@ func (p *pushCmd) setFieldsFromEnv() {
 	}
 	if v, ok := os.LookupEnv("HELM_REPO_USE_HTTP"); ok {
 		p.useHTTP, _ = strconv.ParseBool(v)
+	}
+
+	//Appended for supporting https with certificates
+	if v, ok := os.LookupEnv("HELM_REPO_CA_FILE"); ok && p.caFile == "" {
+		p.caFile = v
+	}
+	if v, ok := os.LookupEnv("HELM_REPO_CERT_FILE"); ok && p.certFile == "" {
+		p.certFile = v
+	}
+	if v, ok := os.LookupEnv("HELM_REPO_KEY_FILE"); ok && p.keyFile == "" {
+		p.keyFile = v
+	}
+	if v, ok := os.LookupEnv("HELM_REPO_INSECURE"); ok {
+		p.InsecureSkipVerify, _ = strconv.ParseBool(v)
 	}
 
 	if p.accessToken == "" {
@@ -173,14 +197,22 @@ func (p *pushCmd) push() error {
 		url = strings.Replace(repo.URL, "cm://", "https://", 1)
 	}
 
-	client := cm.NewClient(
+	client, err := cm.NewClient(
 		cm.URL(url),
 		cm.Username(username),
 		cm.Password(password),
 		cm.AccessToken(p.accessToken),
 		cm.AuthHeader(p.authHeader),
 		cm.ContextPath(p.contextPath),
+		cm.CAFile(p.caFile),
+		cm.CertFile(p.certFile),
+		cm.KeyFile(p.keyFile),
+		cm.InsecureSkipVerify(p.InsecureSkipVerify),
 	)
+
+	if err != nil {
+		return err
+	}
 
 	tmp, err := ioutil.TempDir("", "helm-push-")
 	if err != nil {
@@ -230,14 +262,22 @@ func (p *pushCmd) download(fileURL string) error {
 		parsedURL.Scheme = "https"
 	}
 
-	client := cm.NewClient(
+	client, err := cm.NewClient(
 		cm.URL(parsedURL.String()),
 		cm.Username(p.username),
 		cm.Password(p.password),
 		cm.AccessToken(p.accessToken),
 		cm.AuthHeader(p.authHeader),
 		cm.ContextPath(p.contextPath),
+		cm.CAFile(p.caFile),
+		cm.CertFile(p.certFile),
+		cm.KeyFile(p.keyFile),
+		cm.InsecureSkipVerify(p.InsecureSkipVerify),
 	)
+
+	if err != nil {
+		return err
+	}
 
 	resp, err := client.DownloadFile(filePath)
 	if err != nil {

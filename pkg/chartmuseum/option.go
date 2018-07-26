@@ -10,13 +10,17 @@ type (
 
 	// options specify optional settings
 	options struct {
-		url         string
-		username    string
-		password    string
-		accessToken string
-		authHeader  string
-		contextPath string
-		timeout     time.Duration
+		url                string
+		username           string
+		password           string
+		accessToken        string
+		authHeader         string
+		contextPath        string
+		timeout            time.Duration
+		caFile             string
+		certFile           string
+		keyFile            string
+		InsecureSkipVerify bool
 	}
 )
 
@@ -66,5 +70,33 @@ func ContextPath(contextPath string) Option {
 func Timeout(timeout int64) Option {
 	return func(opts *options) {
 		opts.timeout = time.Duration(timeout) * time.Second
+	}
+}
+
+//CAFile specifies the path of CA bundle
+func CAFile(caFile string) Option {
+	return func(opts *options) {
+		opts.caFile = caFile
+	}
+}
+
+//CertFile specifies the path of SSL certificate file
+func CertFile(certFile string) Option {
+	return func(opts *options) {
+		opts.certFile = certFile
+	}
+}
+
+//KeyFile specifies the path of SSL key file
+func KeyFile(keyFile string) Option {
+	return func(opts *options) {
+		opts.keyFile = keyFile
+	}
+}
+
+//InsecureSkipVerify to indicate if verify the certificate when connecting
+func InsecureSkipVerify(insecureSkipVerify bool) Option {
+	return func(opts *options) {
+		opts.InsecureSkipVerify = insecureSkipVerify
 	}
 }
