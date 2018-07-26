@@ -97,6 +97,14 @@ func TestPushCmd(t *testing.T) {
 		t.Error("unexpecting error uploading tarball", err)
 	}
 
+	// Happy path, by repo URL
+	args = []string{testTarballPath, ts.URL}
+	cmd = newPushCmd(args)
+	err = cmd.RunE(cmd, args)
+	if err != nil {
+		t.Error("unexpecting error uploading tarball, using repo URL", err)
+	}
+
 	// Trigger 409
 	statusCode = 409
 	body = "{\"error\": \"package already exists\"}"

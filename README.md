@@ -10,13 +10,13 @@ Based on the version in `plugin.yaml`, release binary will be downloaded from Gi
 
 ```
 $ helm plugin install https://github.com/chartmuseum/helm-push
-Downloading and installing helm-push v0.4.0 ...
-https://github.com/chartmuseum/helm-push/releases/download/v0.4.0/helm-push_0.4.0_darwin_amd64.tar.gz
+Downloading and installing helm-push v0.5.0 ...
+https://github.com/chartmuseum/helm-push/releases/download/v0.5.0/helm-push_0.5.0_darwin_amd64.tar.gz
 Installed plugin: push
 ```
 
 ## Usage
-You must start by adding a ChartMuseum-backed repo via Helm CLI (if not already added)
+Start by adding a ChartMuseum-backed repo via Helm CLI (if not already added)
 ```
 $ helm repo add chartmuseum http://localhost:8080
 ```
@@ -54,6 +54,24 @@ This workflow does not require the use of `helm package`, but pushing .tgzs is s
 ```
 $ helm push mychart-0.3.2.tgz chartmuseum
 Pushing mychart-0.3.2.tgz to chartmuseum...
+Done.
+```
+
+### Force push
+If your ChartMuseum install is configured with `ALLOW_OVERWRITE=true`, chart versions will be automatically overwritten upon re-upload.
+
+Otherwise, unless your install is configured with `DISABLE_FORCE_OVERWRITE=true` (ChartMuseum > v0.7.1), you can use the `--force`/`-f` option to to force an upload:
+```
+$ helm push --force mychart-0.3.2.tgz chartmuseum
+Pushing mychart-0.3.2.tgz to chartmuseum...
+Done.
+```
+
+### Pushing directly to URL
+If the second argument provided resembles a URL, you are not required to add the repo prior to push:
+```
+$ helm push mychart-0.3.2.tgz http://localhost:8080
+Pushing mychart-0.3.2.tgz to http://localhost:8080...
 Done.
 ```
 

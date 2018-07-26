@@ -11,6 +11,7 @@ import (
 	"os/user"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strconv"
 	"strings"
 
@@ -30,6 +31,7 @@ type (
 		accessToken        string
 		authHeader         string
 		contextPath        string
+		forceUpload        bool
 		useHTTP            bool
 		caFile             string
 		certFile           string
@@ -56,6 +58,7 @@ Examples:
   $ helm push mychart-0.1.0.tgz chartmuseum       # push .tgz from "helm package"
   $ helm push . chartmuseum                       # package and push chart directory
   $ helm push . --version="7c4d121" chartmuseum   # override version in Chart.yaml
+  $ helm push . https://my.chart.repo.com         # push directly to chart repo URL
 `
 )
 
@@ -75,7 +78,7 @@ func newPushCmd(args []string) *cobra.Command {
 			}
 
 			if len(args) != 2 {
-				return errors.New("This command needs 2 arguments: name of chart, name of chart repository")
+				return errors.New("This command needs 2 arguments: name of chart, name of chart repository (or repo URL)")
 			}
 			p.chartName = args[0]
 			p.repoName = args[1]
@@ -95,6 +98,7 @@ func newPushCmd(args []string) *cobra.Command {
 	f.StringVarP(&p.certFile, "cert-file", "", "", "Identify HTTPS client using this SSL certificate file [$HELM_REPO_CERT_FILE]")
 	f.StringVarP(&p.keyFile, "key-file", "", "", "Identify HTTPS client using this SSL key file [$HELM_REPO_KEY_FILE]")
 	f.BoolVarP(&p.InsecureSkipVerify, "insecure", "", false, "Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]")
+	f.BoolVarP(&p.forceUpload, "force", "f", false, "Force upload even if chart version exists")
 	f.Parse(args)
 	return cmd
 }
@@ -164,7 +168,18 @@ func (p *pushCmd) setAccessTokenFromConfigFile() {
 }
 
 func (p *pushCmd) push() error {
-	repo, err := helm.GetRepoByName(p.repoName)
+	var repo *helm.Repo
+	var err error
+
+	// If the argument looks like a URL, just create a temp repo object
+	// instead of looking for the entry in the local repository list
+	if regexp.MustCompile(`^https?://`).MatchString(p.repoName) {
+		repo, err = helm.TempRepoFromURL(p.repoName)
+		p.repoName = repo.URL
+	} else {
+		repo, err = helm.GetRepoByName(p.repoName)
+	}
+
 	if err != nil {
 		return err
 	}
@@ -226,7 +241,7 @@ func (p *pushCmd) push() error {
 	}
 
 	fmt.Printf("Pushing %s to %s...\n", filepath.Base(chartPackagePath), p.repoName)
-	resp, err := client.UploadChartPackage(chartPackagePath)
+	resp, err := client.UploadChartPackage(chartPackagePath, p.forceUpload)
 	if err != nil {
 		return err
 	}

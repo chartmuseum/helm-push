@@ -6,6 +6,8 @@ import (
 	"k8s.io/helm/pkg/helm/helmpath"
 	"k8s.io/helm/pkg/repo"
 	"os"
+	"strings"
+	urllib "net/url"
 )
 
 type (
@@ -24,6 +26,25 @@ func GetRepoByName(name string) (*Repo, error) {
 	entry, exists := findRepoEntry(name, r)
 	if !exists {
 		return nil, fmt.Errorf("no repo named %q found", name)
+	}
+	return &Repo{entry}, nil
+}
+
+// TempRepoFromURL builds a temporary Repo from a given URL
+func TempRepoFromURL(url string) (*Repo, error) {
+	u, err := urllib.Parse(url)
+	if err != nil {
+		return nil, err
+	}
+	entry := &repo.Entry{}
+	if u.User != nil {
+		// remove the username/password section from URL
+		pass, _ := u.User.Password()
+		entry.URL = strings.Split(url, "://")[0] + "://" + strings.Split(url, fmt.Sprintf("%s@", pass))[1]
+		entry.Username = u.User.Username()
+		entry.Password = pass
+	} else {
+		entry.URL = url
 	}
 	return &Repo{entry}, nil
 }
