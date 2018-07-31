@@ -36,7 +36,7 @@ type (
 		caFile             string
 		certFile           string
 		keyFile            string
-		InsecureSkipVerify bool
+		insecureSkipVerify bool
 	}
 
 	config struct {
@@ -93,11 +93,10 @@ func newPushCmd(args []string) *cobra.Command {
 	f.StringVarP(&p.accessToken, "access-token", "", "", "Send token in Authorization header [$HELM_REPO_ACCESS_TOKEN]")
 	f.StringVarP(&p.authHeader, "auth-header", "", "", "Alternative header to use for token auth [$HELM_REPO_AUTH_HEADER]")
 	f.StringVarP(&p.contextPath, "context-path", "", "", "ChartMuseum context path [$HELM_REPO_CONTEXT_PATH]")
-	//Appended for supporting https with certificates
 	f.StringVarP(&p.caFile, "ca-file", "", "", "Verify certificates of HTTPS-enabled servers using this CA bundle [$HELM_REPO_CA_FILE]")
 	f.StringVarP(&p.certFile, "cert-file", "", "", "Identify HTTPS client using this SSL certificate file [$HELM_REPO_CERT_FILE]")
 	f.StringVarP(&p.keyFile, "key-file", "", "", "Identify HTTPS client using this SSL key file [$HELM_REPO_KEY_FILE]")
-	f.BoolVarP(&p.InsecureSkipVerify, "insecure", "", false, "Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]")
+	f.BoolVarP(&p.insecureSkipVerify, "insecure", "", false, "Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]")
 	f.BoolVarP(&p.forceUpload, "force", "f", false, "Force upload even if chart version exists")
 	f.Parse(args)
 	return cmd
@@ -122,8 +121,6 @@ func (p *pushCmd) setFieldsFromEnv() {
 	if v, ok := os.LookupEnv("HELM_REPO_USE_HTTP"); ok {
 		p.useHTTP, _ = strconv.ParseBool(v)
 	}
-
-	//Appended for supporting https with certificates
 	if v, ok := os.LookupEnv("HELM_REPO_CA_FILE"); ok && p.caFile == "" {
 		p.caFile = v
 	}
@@ -134,7 +131,7 @@ func (p *pushCmd) setFieldsFromEnv() {
 		p.keyFile = v
 	}
 	if v, ok := os.LookupEnv("HELM_REPO_INSECURE"); ok {
-		p.InsecureSkipVerify, _ = strconv.ParseBool(v)
+		p.insecureSkipVerify, _ = strconv.ParseBool(v)
 	}
 
 	if p.accessToken == "" {
@@ -222,7 +219,7 @@ func (p *pushCmd) push() error {
 		cm.CAFile(p.caFile),
 		cm.CertFile(p.certFile),
 		cm.KeyFile(p.keyFile),
-		cm.InsecureSkipVerify(p.InsecureSkipVerify),
+		cm.InsecureSkipVerify(p.insecureSkipVerify),
 	)
 
 	if err != nil {
@@ -287,7 +284,7 @@ func (p *pushCmd) download(fileURL string) error {
 		cm.CAFile(p.caFile),
 		cm.CertFile(p.certFile),
 		cm.KeyFile(p.keyFile),
-		cm.InsecureSkipVerify(p.InsecureSkipVerify),
+		cm.InsecureSkipVerify(p.insecureSkipVerify),
 	)
 
 	if err != nil {

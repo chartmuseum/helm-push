@@ -54,7 +54,7 @@ func TestNewClient(t *testing.T) {
 		t.Errorf("expected key file path to be '../../testdata/tls/test_key.key' but got %v", cmClient.opts.keyFile)
 	}
 
-	if !cmClient.opts.InsecureSkipVerify {
-		t.Errorf("expected insecure flag to be 'true' but got %v", cmClient.opts.InsecureSkipVerify)
+	if !cmClient.opts.insecureSkipVerify {
+		t.Errorf("expected insecure flag to be 'true' but got %v", cmClient.opts.insecureSkipVerify)
 	}
 }

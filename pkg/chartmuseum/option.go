@@ -20,7 +20,7 @@ type (
 		caFile             string
 		certFile           string
 		keyFile            string
-		InsecureSkipVerify bool
+		insecureSkipVerify bool
 	}
 )
 
@@ -97,6 +97,6 @@ func KeyFile(keyFile string) Option {
 //InsecureSkipVerify to indicate if verify the certificate when connecting
 func InsecureSkipVerify(insecureSkipVerify bool) Option {
 	return func(opts *options) {
-		opts.InsecureSkipVerify = insecureSkipVerify
+		opts.insecureSkipVerify = insecureSkipVerify
 	}
 }

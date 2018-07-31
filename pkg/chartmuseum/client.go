@@ -37,7 +37,7 @@ func NewClient(opts ...Option) (*Client, error) {
 		client.opts.certFile,
 		client.opts.keyFile,
 		client.opts.caFile,
-		client.opts.InsecureSkipVerify,
+		client.opts.insecureSkipVerify,
 	)
 	if err != nil {
 		return nil, err
