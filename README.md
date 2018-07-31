@@ -1,9 +1,9 @@
 # helm push plugin
-<img align="right" src="https://github.com/kubernetes-helm/chartmuseum/raw/master/logo.png">
+<img align="right" src="https://github.com/helm/chartmuseum/raw/master/logo.png">
 
-[![Codefresh build status]( https://g.codefresh.io/api/badges/build?repoOwner=chartmuseum&repoName=helm-push&branch=master&pipelineName=helm-push&accountName=codefresh-inc&type=cf-2)]( https://g.codefresh.io/repositories/chartmuseum/helm-push/builds?filter=trigger:build;branch:master;service:5ad4eed637adc30001207fab~helm-push)
+[![Codefresh build status]( https://g.codefresh.io/api/badges/pipeline/codefresh-inc/chartmuseum%2Fhelm-push%2Fhelm-push?branch=master&type=cf-2)]( https://g.codefresh.io/repositories/chartmuseum/helm-push/builds?filter=trigger:build;branch:master;service:5ad4eed637adc30001207fab~helm-push)
 
-Helm plugin to push chart package to [ChartMuseum](https://github.com/kubernetes-helm/chartmuseum)
+Helm plugin to push chart package to [ChartMuseum](https://github.com/helm/chartmuseum)
 
 ## Install
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
@@ -110,6 +110,33 @@ This will then be used in place of `Authorization: Bearer`:
 <myheader>: <token>
 ```
 
+#### Token config file (~/.cfconfig)
+For users of [Managed Helm Repositories](https://codefresh.io/codefresh-news/introducing-managed-helm-repositories/) (Codefresh), the plugin is able to auto-detect your API key from `~/.cfconfig`. This file is managed by [Codefresh CLI](https://codefresh-io.github.io/cli/).
+
+If detected, this API key will be used for token-based auth, overriding basic auth options described above.
+
+The format of this file is the following:
+
+```
+contexts:
+  default:
+    name: default
+    token: <token>
+current-context: default
+```
+
+### TLS Client Cert Auth
+
+ChartMuseum server does not yet have options to setup TLS client cert authentication (please see [chartmuseum#79](https://github.com/helm/chartmuseum/issues/79)).
+
+If you are running ChartMuseum behind a frontend that does, the following options are available:
+
+```
+--ca-file string    Verify certificates of HTTPS-enabled servers using this CA bundle [$HELM_REPO_CA_FILE]
+--cert-file string  Identify HTTPS client using this SSL certificate file [$HELM_REPO_CERT_FILE]
+--key-file string   Identify HTTPS client using this SSL key file [$HELM_REPO_KEY_FILE]
+--insecure          Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]
+```
 
 ## Custom Downloader
 This plugin also defines the `cm://` protocol that you may specify when adding a repo:
