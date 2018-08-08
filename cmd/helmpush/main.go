@@ -226,6 +226,15 @@ func (p *pushCmd) push() error {
 		return err
 	}
 
+	// update context path if not overrided
+	if p.contextPath == "" {
+		index, err := helm.GetIndexByRepo(repo, getIndexDownloader(client))
+		if err != nil {
+			return err
+		}
+		client.Option(cm.ContextPath(index.ContextPath))
+	}
+
 	tmp, err := ioutil.TempDir("", "helm-push-")
 	if err != nil {
 		return err
@@ -333,6 +342,24 @@ func getChartmuseumError(b []byte, code int) error {
 		return fmt.Errorf("%d: could not properly parse response JSON: %s", code, string(b))
 	}
 	return fmt.Errorf("%d: %s", code, er.Error)
+}
+
+func getIndexDownloader(client *cm.Client) helm.IndexDownloader {
+	return func() ([]byte, error) {
+		resp, err := client.DownloadFile("index.yaml")
+		if err != nil {
+			return nil, err
+		}
+		defer resp.Body.Close()
+		b, err := ioutil.ReadAll(resp.Body)
+		if err != nil {
+			return nil, err
+		}
+		if resp.StatusCode != 200 {
+			return nil, getChartmuseumError(b, resp.StatusCode)
+		}
+		return b, nil
+	}
 }
 
 func main() {
