@@ -11,7 +11,7 @@ type (
 	// Index represents the index file in a chart repository
 	Index struct {
 		*repo.IndexFile
-		ContextPath string `json:"contextPath"`
+		ServerInfo ServerInfo `json:"serverInfo"`
 	}
 
 	// IndexDownloader is a function to download the index

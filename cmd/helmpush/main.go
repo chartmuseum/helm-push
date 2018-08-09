@@ -232,7 +232,7 @@ func (p *pushCmd) push() error {
 		if err != nil {
 			return err
 		}
-		client.Option(cm.ContextPath(index.ContextPath))
+		client.Option(cm.ContextPath(index.ServerInfo.ContextPath))
 	}
 
 	tmp, err := ioutil.TempDir("", "helm-push-")
