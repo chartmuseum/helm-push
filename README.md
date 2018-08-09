@@ -75,6 +75,30 @@ Pushing mychart-0.3.2.tgz to http://localhost:8080...
 Done.
 ```
 
+## Context Path
+
+If you are running ChartMuseum behind a proxy that adds a route prefix, for example:
+```
+https://my.chart.repo.com/helm/v1/index.yaml -> http://chartmuseum-svc/index.yaml
+```
+
+You can use the `--context-path=` option or `HELM_REPO_CONTEXT_PATH` env var in order for the plugin to construct the upload URL correctly:
+```
+helm repo add chartmuseum https://my.chart.repo.com/helm/v1
+helm push --context-path=/helm/v1 mychart-0.3.2.tgz chartmuseum
+```
+
+Alternatively, you can add `serverInfo.contextPath` to your index.yaml:
+```
+apiVersion: v1
+entries:{}
+generated: "2018-08-09T11:08:21-05:00"
+serverInfo:
+  contextPath: /helm/v1
+```
+
+In ChartMuseum server (>0.7.1) this will automatically be added to index.yaml if the `--context-path` option is provided.
+
 ## Authentication
 ### Basic Auth
 If you have added your repo with the `--username`/`--password` flags (Helm 2.9+), or have added your repo with the basic auth username/password in the URL (e.g. `https://myuser:mypass@my.chart.repo.com`), no further setup is required.
