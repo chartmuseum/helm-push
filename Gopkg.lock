@@ -41,8 +41,8 @@
     "ptypes/any",
     "ptypes/timestamp"
   ]
-  revision = "b4deda0973fb4c70b50d226b1af49f3da59f5265"
-  version = "v1.1.0"
+  revision = "aa810b61a9c79d51363740d207bb46cf8e620ed5"
+  version = "v1.2.0"
 
 [[projects]]
   name = "github.com/inconshreveable/mousetrap"
@@ -59,8 +59,8 @@
 [[projects]]
   name = "github.com/spf13/pflag"
   packages = ["."]
-  revision = "583c0c0531f06d5278b7d917446061adc344b5cd"
-  version = "v1.0.1"
+  revision = "9a97c102cda95a86cec2345a6f09f55a939babf5"
+  version = "v1.0.2"
 
 [[projects]]
   branch = "master"
@@ -75,7 +75,7 @@
     "openpgp/packet",
     "openpgp/s2k"
   ]
-  revision = "a49355c7e3f8fe157a85be2f77e6e269a0f89602"
+  revision = "614d502a4dac94afa3a6ce146bd1736da82514c6"
 
 [[projects]]
   name = "gopkg.in/yaml.v2"
@@ -87,7 +87,7 @@
   branch = "master"
   name = "k8s.io/apimachinery"
   packages = ["pkg/version"]
-  revision = "705cfa51a97f837a6599d463e2e206ad65903b60"
+  revision = "017bf4f8f5884203a401400e511f4c8fc2eded21"
 
 [[projects]]
   name = "k8s.io/client-go"
@@ -113,12 +113,12 @@
     "pkg/urlutil",
     "pkg/version"
   ]
-  revision = "20adb27c7c5868466912eebdf6664e7390ebe710"
-  version = "v2.9.1"
+  revision = "9ad53aac42165a5fadc6c87be0dea6b115f93090"
+  version = "v2.10.0"
 
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  inputs-digest = "a0b3533a099f18cb9555d4bb0f931fa2b9f722d99292a7620b67bcf8e8d919fb"
+  inputs-digest = "26179f9e50b7ac941ec9e2081ad279b0bf2ece59a464a9d6415ad7822d2ef38c"
   solver-name = "gps-cdcl"
   solver-version = 1
