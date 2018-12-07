@@ -11,4 +11,3 @@ bin/
 dist/
 releases/
 testbin/
-vendor/

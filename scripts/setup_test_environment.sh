@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-HELM_VERSION="2.10.0"
+HELM_VERSION="2.12.0-rc.2"
 CHARTMUSEUM_VERSION="0.7.1"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
