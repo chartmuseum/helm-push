@@ -6,4 +6,4 @@ steps:
     working_directory: /go/src/github.com/chartmuseum
     commands:
       - ln -s /codefresh/volume/${{CF_REPO_NAME}} helm-push && cd helm-push
-      - make bootstrap test build_linux link_linux acceptance
+      - make test build_linux link_linux acceptance
