@@ -1,7 +1,7 @@
 #!/bin/bash -ex
 
-HELM_VERSION="2.12.0-rc.2"
-CHARTMUSEUM_VERSION="0.7.1"
+HELM_VERSION="2.13.1"
+CHARTMUSEUM_VERSION="0.8.2"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../
