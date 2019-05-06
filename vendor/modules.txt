@@ -1,0 +1,59 @@
+# github.com/BurntSushi/toml v0.3.1
+github.com/BurntSushi/toml
+# github.com/Masterminds/semver v1.4.2
+github.com/Masterminds/semver
+# github.com/cyphar/filepath-securejoin v0.2.2
+github.com/cyphar/filepath-securejoin
+# github.com/ghodss/yaml v1.0.0
+github.com/ghodss/yaml
+# github.com/gobwas/glob v0.2.3
+github.com/gobwas/glob
+github.com/gobwas/glob/compiler
+github.com/gobwas/glob/syntax
+github.com/gobwas/glob/match
+github.com/gobwas/glob/syntax/ast
+github.com/gobwas/glob/util/runes
+github.com/gobwas/glob/syntax/lexer
+github.com/gobwas/glob/util/strings
+# github.com/golang/protobuf v1.2.0
+github.com/golang/protobuf/ptypes/any
+github.com/golang/protobuf/ptypes/timestamp
+github.com/golang/protobuf/proto
+# github.com/inconshreveable/mousetrap v1.0.0
+github.com/inconshreveable/mousetrap
+# github.com/pkg/errors v0.8.1
+github.com/pkg/errors
+# github.com/spf13/cobra v0.0.3
+github.com/spf13/cobra
+# github.com/spf13/pflag v1.0.3
+github.com/spf13/pflag
+# golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9
+golang.org/x/crypto/openpgp
+golang.org/x/crypto/openpgp/clearsign
+golang.org/x/crypto/openpgp/packet
+golang.org/x/crypto/openpgp/armor
+golang.org/x/crypto/openpgp/errors
+golang.org/x/crypto/openpgp/s2k
+golang.org/x/crypto/cast5
+golang.org/x/crypto/openpgp/elgamal
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
+# k8s.io/apimachinery v0.0.0-20181207080347-f1a02064268b
+k8s.io/apimachinery/pkg/version
+# k8s.io/client-go v10.0.0+incompatible
+k8s.io/client-go/util/homedir
+# k8s.io/helm v2.13.1+incompatible
+k8s.io/helm/pkg/tlsutil
+k8s.io/helm/pkg/chartutil
+k8s.io/helm/pkg/helm/environment
+k8s.io/helm/pkg/helm/helmpath
+k8s.io/helm/pkg/proto/hapi/chart
+k8s.io/helm/pkg/repo
+k8s.io/helm/pkg/getter
+k8s.io/helm/pkg/urlutil
+k8s.io/helm/pkg/ignore
+k8s.io/helm/pkg/proto/hapi/version
+k8s.io/helm/pkg/sympath
+k8s.io/helm/pkg/version
+k8s.io/helm/pkg/provenance
+k8s.io/helm/pkg/plugin
