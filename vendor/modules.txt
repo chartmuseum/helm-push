@@ -43,17 +43,19 @@ k8s.io/apimachinery/pkg/version
 # k8s.io/client-go v10.0.0+incompatible
 k8s.io/client-go/util/homedir
 # k8s.io/helm v2.13.1+incompatible
-k8s.io/helm/pkg/tlsutil
 k8s.io/helm/pkg/chartutil
+k8s.io/helm/pkg/downloader
 k8s.io/helm/pkg/helm/environment
+k8s.io/helm/pkg/tlsutil
 k8s.io/helm/pkg/helm/helmpath
 k8s.io/helm/pkg/proto/hapi/chart
 k8s.io/helm/pkg/repo
-k8s.io/helm/pkg/getter
-k8s.io/helm/pkg/urlutil
 k8s.io/helm/pkg/ignore
 k8s.io/helm/pkg/proto/hapi/version
 k8s.io/helm/pkg/sympath
 k8s.io/helm/pkg/version
+k8s.io/helm/pkg/getter
 k8s.io/helm/pkg/provenance
+k8s.io/helm/pkg/resolver
+k8s.io/helm/pkg/urlutil
 k8s.io/helm/pkg/plugin
