@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -15,10 +16,15 @@ import (
 	"strconv"
 	"strings"
 
+	"k8s.io/helm/pkg/chartutil"
+
 	cm "github.com/chartmuseum/helm-push/pkg/chartmuseum"
 	"github.com/chartmuseum/helm-push/pkg/helm"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
+	"k8s.io/helm/pkg/downloader"
+	"k8s.io/helm/pkg/getter"
+	helmEnv "k8s.io/helm/pkg/helm/environment"
 )
 
 type (
@@ -37,6 +43,9 @@ type (
 		certFile           string
 		keyFile            string
 		insecureSkipVerify bool
+		keyring            string
+		dependencyUpdate   bool
+		out                io.Writer
 	}
 
 	config struct {
@@ -51,6 +60,7 @@ type (
 )
 
 var (
+	settings    helmEnv.EnvSettings
 	globalUsage = `Helm plugin to push chart package to ChartMuseum
 
 Examples:
@@ -70,6 +80,8 @@ func newPushCmd(args []string) *cobra.Command {
 		Long:         globalUsage,
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			p.out = cmd.OutOrStdout()
 
 			// If there are 4 args, this is likely being used as a downloader for cm:// protocol
 			if len(args) == 4 && strings.HasPrefix(args[3], "cm://") {
@@ -96,9 +108,16 @@ func newPushCmd(args []string) *cobra.Command {
 	f.StringVarP(&p.caFile, "ca-file", "", "", "Verify certificates of HTTPS-enabled servers using this CA bundle [$HELM_REPO_CA_FILE]")
 	f.StringVarP(&p.certFile, "cert-file", "", "", "Identify HTTPS client using this SSL certificate file [$HELM_REPO_CERT_FILE]")
 	f.StringVarP(&p.keyFile, "key-file", "", "", "Identify HTTPS client using this SSL key file [$HELM_REPO_KEY_FILE]")
+	f.StringVar(&p.keyring, "keyring", defaultKeyring(), "location of a public keyring")
 	f.BoolVarP(&p.insecureSkipVerify, "insecure", "", false, "Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]")
 	f.BoolVarP(&p.forceUpload, "force", "f", false, "Force upload even if chart version exists")
+	f.BoolVarP(&p.dependencyUpdate, "dependency-update", "d", false, `update dependencies from "requirements.yaml" to dir "charts/" before packaging`)
+
 	f.Parse(args)
+
+	settings.AddFlags(f)
+	settings.Init(f)
+
 	return cmd
 }
 
@@ -179,6 +198,34 @@ func (p *pushCmd) push() error {
 
 	if err != nil {
 		return err
+	}
+
+	if p.dependencyUpdate {
+		name := filepath.FromSlash(p.chartName)
+		fi, err := os.Stat(name)
+		if err != nil {
+			return err
+		}
+		if fi.IsDir() {
+			if validChart, err := chartutil.IsChartDir(name); !validChart {
+				return err
+			}
+			chartPath, err := filepath.Abs(p.chartName)
+			if err != nil {
+				return err
+			}
+			downloadManager := &downloader.Manager{
+				Out:       p.out,
+				ChartPath: chartPath,
+				HelmHome:  settings.Home,
+				Keyring:   p.keyring,
+				Getters:   getter.All(settings),
+				Debug:     settings.Debug,
+			}
+			if err := downloadManager.Update(); err != nil {
+				return err
+			}
+		}
 	}
 
 	chart, err := helm.GetChartByName(p.chartName)
@@ -367,4 +414,9 @@ func main() {
 	if err := cmd.Execute(); err != nil {
 		os.Exit(1)
 	}
+}
+
+// defaultKeyring returns the expanded path to the default keyring.
+func defaultKeyring() string {
+	return os.ExpandEnv("$HOME/.gnupg/pubring.gpg")
 }

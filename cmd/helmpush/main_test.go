@@ -11,14 +11,12 @@ import (
 	"testing"
 
 	"k8s.io/helm/pkg/getter"
-	helm_env "k8s.io/helm/pkg/helm/environment"
 	"k8s.io/helm/pkg/helm/helmpath"
 	"k8s.io/helm/pkg/repo"
 	"k8s.io/helm/pkg/tlsutil"
 )
 
 var (
-	settings           helm_env.EnvSettings
 	testTarballPath    = "../../testdata/charts/mychart/mychart-0.1.0.tgz"
 	testCertPath       = "../../testdata/tls/test_cert.crt"
 	testKeyPath        = "../../testdata/tls/test_key.key"
