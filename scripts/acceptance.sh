@@ -14,8 +14,8 @@ fi
 export PATH="$PWD/testbin:$PWD/bin/$PLATFORM/amd64:$PATH"
 export HELM_PUSH_PLUGIN_NO_INSTALL_HOOK=1
 
-export HELM_HOME="$PWD/.helm"
-helm2 init --client-only
+export TEST_HELM_HOME="$PWD/.helm"
+HELM_HOME=${TEST_HELM_HOME} helm2 init --client-only
 
 if [ ! -d .venv/ ]; then
     virtualenv -p $(which python2.7) .venv/

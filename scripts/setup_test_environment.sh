@@ -8,7 +8,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../
 
 export PATH="$PWD/testbin:$PATH"
-export HELM_HOME="$PWD/.helm"
+export TEST_HELM_HOME="$PWD/.helm"
 
 [ "$(uname)" == "Darwin" ] && PLATFORM="darwin" || PLATFORM="linux"
 
@@ -33,7 +33,7 @@ install_helm_v2() {
         chmod +x ./helm
         mv ./helm ./helm2
         popd
-        helm2 init --client-only
+        HELM_HOME=${TEST_HELM_HOME} helm2 init --client-only
     fi
 }
 
@@ -65,10 +65,18 @@ install_chartmuseum() {
 }
 
 package_test_charts() {
-    pushd testdata/charts/
+    pushd testdata/charts/helm2/
     for d in $(find . -maxdepth 1 -mindepth 1 -type d); do
         pushd $d
-        helm2 package --sign --key helm-test --keyring ../../pgp/helm-test-key.secret .
+        HELM_HOME=${TEST_HELM_HOME} helm2 package --sign --key helm-test --keyring ../../../pgp/helm-test-key.secret .
+        popd
+    done
+    popd
+
+    pushd testdata/charts/helm3/
+    for d in $(find . -maxdepth 1 -mindepth 1 -type d); do
+        pushd $d
+        helm3 package --sign --key helm-test --keyring ../../../pgp/helm-test-key.secret .
         popd
     done
     popd
