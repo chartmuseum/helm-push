@@ -50,8 +50,18 @@ func TempRepoFromURL(url string) (*Repo, error) {
 }
 
 func repoFile() (*repo.RepoFile, error) {
-	home := helmHome()
-	return repo.LoadRepositoriesFile(home.RepositoryFile())
+	var repoFilePath string
+	helmMajorVersion := GetHelmMajorVersion()
+	if helmMajorVersion == HelmMajorVersion2 {
+		home := helmHome()
+		repoFilePath = home.RepositoryFile()
+	} else {
+		// TODO: fix, this only works for default mac
+		userHome, _ := os.UserHomeDir()
+		repoFilePath = fmt.Sprintf("%s/Library/Preferences/helm/repositories.yaml", userHome)
+	}
+	repoFile, err := repo.LoadRepositoriesFile(repoFilePath)
+	return repoFile, err
 }
 
 func helmHome() helmpath.Home {
