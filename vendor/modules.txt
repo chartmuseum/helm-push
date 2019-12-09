@@ -36,7 +36,7 @@ golang.org/x/crypto/openpgp/errors
 golang.org/x/crypto/openpgp/s2k
 golang.org/x/crypto/cast5
 golang.org/x/crypto/openpgp/elgamal
-# gopkg.in/yaml.v2 v2.2.2
+# gopkg.in/yaml.v2 v2.2.7
 gopkg.in/yaml.v2
 # k8s.io/apimachinery v0.0.0-20181207080347-f1a02064268b
 k8s.io/apimachinery/pkg/version
@@ -45,6 +45,7 @@ k8s.io/client-go/util/homedir
 # k8s.io/helm v2.13.1+incompatible
 k8s.io/helm/pkg/chartutil
 k8s.io/helm/pkg/downloader
+k8s.io/helm/pkg/getter
 k8s.io/helm/pkg/helm/environment
 k8s.io/helm/pkg/tlsutil
 k8s.io/helm/pkg/helm/helmpath
@@ -54,7 +55,6 @@ k8s.io/helm/pkg/ignore
 k8s.io/helm/pkg/proto/hapi/version
 k8s.io/helm/pkg/sympath
 k8s.io/helm/pkg/version
-k8s.io/helm/pkg/getter
 k8s.io/helm/pkg/provenance
 k8s.io/helm/pkg/resolver
 k8s.io/helm/pkg/urlutil
