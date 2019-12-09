@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var testTarballPath = "../../testdata/charts/mychart/mychart-0.1.0.tgz"
+var testTarballPath = "../../testdata/charts/helm2/mychart/mychart-0.1.0.tgz"
 
 func TestSetVersion(t *testing.T) {
 	c, err := GetChartByName(testTarballPath)

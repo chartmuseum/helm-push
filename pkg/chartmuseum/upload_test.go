@@ -13,7 +13,7 @@ import (
 )
 
 var (
-	testTarballPath    = "../../testdata/charts/mychart/mychart-0.1.0.tgz"
+	testTarballPath    = "../../testdata/charts/helm2/mychart/mychart-0.1.0.tgz"
 	testCertPath       = "../../testdata/tls/test_cert.crt"
 	testKeyPath        = "../../testdata/tls/test_key.key"
 	testCAPath         = "../../testdata/tls/ca.crt"
