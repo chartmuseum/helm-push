@@ -2,18 +2,21 @@ package helm
 
 import (
 	"fmt"
-	helm_env "k8s.io/helm/pkg/helm/environment"
-	"k8s.io/helm/pkg/helm/helmpath"
-	"k8s.io/helm/pkg/repo"
+	urllib "net/url"
 	"os"
 	"strings"
-	urllib "net/url"
+
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/repo"
+	helm_env "k8s.io/helm/pkg/helm/environment"
+	"k8s.io/helm/pkg/helm/helmpath"
 )
 
 type (
 	// Repo represents a collection of parameters for chart repository
 	Repo struct {
-		*repo.Entry
+		*repo.ChartRepository
 	}
 )
 
@@ -27,7 +30,11 @@ func GetRepoByName(name string) (*Repo, error) {
 	if !exists {
 		return nil, fmt.Errorf("no repo named %q found", name)
 	}
-	return &Repo{entry}, nil
+	cr, err := repo.NewChartRepository(entry, getter.All(cli.New()))
+	if err != nil {
+		return nil, err
+	}
+	return &Repo{cr}, nil
 }
 
 // TempRepoFromURL builds a temporary Repo from a given URL
@@ -46,10 +53,14 @@ func TempRepoFromURL(url string) (*Repo, error) {
 	} else {
 		entry.URL = url
 	}
-	return &Repo{entry}, nil
+	cr, err := repo.NewChartRepository(entry, getter.All(cli.New()))
+	if err != nil {
+		return nil, err
+	}
+	return &Repo{cr}, nil
 }
 
-func repoFile() (*repo.RepoFile, error) {
+func repoFile() (*repo.File, error) {
 	var repoFilePath string
 	helmMajorVersion := GetHelmMajorVersion()
 	if helmMajorVersion == HelmMajorVersion2 {
@@ -60,7 +71,7 @@ func repoFile() (*repo.RepoFile, error) {
 		userHome, _ := os.UserHomeDir()
 		repoFilePath = fmt.Sprintf("%s/Library/Preferences/helm/repositories.yaml", userHome)
 	}
-	repoFile, err := repo.LoadRepositoriesFile(repoFilePath)
+	repoFile, err := repo.LoadFile(repoFilePath)
 	return repoFile, err
 }
 
@@ -74,7 +85,7 @@ func helmHome() helmpath.Home {
 	return helmpath.Home(helmHomePath)
 }
 
-func findRepoEntry(name string, r *repo.RepoFile) (*repo.Entry, bool) {
+func findRepoEntry(name string, r *repo.File) (*repo.Entry, bool) {
 	var entry *repo.Entry
 	exists := false
 	for _, re := range r.Repositories {

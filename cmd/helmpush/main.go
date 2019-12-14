@@ -191,7 +191,7 @@ func (p *pushCmd) push() error {
 	// instead of looking for the entry in the local repository list
 	if regexp.MustCompile(`^https?://`).MatchString(p.repoName) {
 		repo, err = helm.TempRepoFromURL(p.repoName)
-		p.repoName = repo.URL
+		p.repoName = repo.Config.URL
 	} else {
 		repo, err = helm.GetRepoByName(p.repoName)
 	}
@@ -239,8 +239,8 @@ func (p *pushCmd) push() error {
 	}
 
 	// username/password override(s)
-	username := repo.Username
-	password := repo.Password
+	username := repo.Config.Username
+	password := repo.Config.Password
 	if p.username != "" {
 		username = p.username
 	}
@@ -251,9 +251,9 @@ func (p *pushCmd) push() error {
 	// in case the repo is stored with cm:// protocol, remove it
 	var url string
 	if p.useHTTP {
-		url = strings.Replace(repo.URL, "cm://", "http://", 1)
+		url = strings.Replace(repo.Config.URL, "cm://", "http://", 1)
 	} else {
-		url = strings.Replace(repo.URL, "cm://", "https://", 1)
+		url = strings.Replace(repo.Config.URL, "cm://", "https://", 1)
 	}
 
 	client, err := cm.NewClient(

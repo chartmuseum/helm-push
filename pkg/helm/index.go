@@ -2,6 +2,8 @@ package helm
 
 import (
 	"io/ioutil"
+	"fmt"
+	"path/filepath"
 
 	"github.com/ghodss/yaml"
 	"k8s.io/helm/pkg/repo"
@@ -20,9 +22,9 @@ type (
 
 // GetIndexByRepo returns index by repository
 func GetIndexByRepo(repo *Repo, downloadIndex IndexDownloader) (*Index, error) {
-	if repo.Cache != "" {
+	if repo.Config.Name != "" {
 		return GetIndexByDownloader(func() ([]byte, error) {
-			return ioutil.ReadFile(repo.Cache)
+			return ioutil.ReadFile(filepath.Join(repo.CachePath, fmt.Sprintf("%s-index.yaml", repo.Config.Name)))
 		})
 	}
 	return GetIndexByDownloader(downloadIndex)
