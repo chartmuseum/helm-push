@@ -2,18 +2,22 @@ package helm
 
 import (
 	"fmt"
-	helm_env "k8s.io/helm/pkg/helm/environment"
-	"k8s.io/helm/pkg/helm/helmpath"
-	"k8s.io/helm/pkg/repo"
-	"os"
-	"strings"
 	urllib "net/url"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/repo"
+	v2environment "k8s.io/helm/pkg/helm/environment"
+	v2helmpath "k8s.io/helm/pkg/helm/helmpath"
 )
 
 type (
 	// Repo represents a collection of parameters for chart repository
 	Repo struct {
-		*repo.Entry
+		*repo.ChartRepository
 	}
 )
 
@@ -27,7 +31,20 @@ func GetRepoByName(name string) (*Repo, error) {
 	if !exists {
 		return nil, fmt.Errorf("no repo named %q found", name)
 	}
-	return &Repo{entry}, nil
+
+	settings := cli.New()
+	getters := getter.All(settings)
+	cr, err := repo.NewChartRepository(entry, getters)
+	if err != nil {
+		return nil, err
+	}
+
+	if HelmMajorVersionCurrent() == HelmMajorVersion2 {
+		home := v2helmHome()
+		cr.CachePath = filepath.Join(home.Repository(), "cache")
+	}
+
+	return &Repo{cr}, nil
 }
 
 // TempRepoFromURL builds a temporary Repo from a given URL
@@ -46,25 +63,37 @@ func TempRepoFromURL(url string) (*Repo, error) {
 	} else {
 		entry.URL = url
 	}
-	return &Repo{entry}, nil
+	cr, err := repo.NewChartRepository(entry, getter.All(cli.New()))
+	if err != nil {
+		return nil, err
+	}
+	return &Repo{cr}, nil
 }
 
-func repoFile() (*repo.RepoFile, error) {
-	home := helmHome()
-	return repo.LoadRepositoriesFile(home.RepositoryFile())
+func repoFile() (*repo.File, error) {
+	var repoFilePath string
+	if HelmMajorVersionCurrent() == HelmMajorVersion2 {
+		home := v2helmHome()
+		repoFilePath = home.RepositoryFile()
+	} else {
+		settings := cli.New()
+		repoFilePath = settings.RepositoryConfig
+	}
+	repoFile, err := repo.LoadFile(repoFilePath)
+	return repoFile, err
 }
 
-func helmHome() helmpath.Home {
+func v2helmHome() v2helmpath.Home {
 	var helmHomePath string
 	if v, ok := os.LookupEnv("HELM_HOME"); ok {
 		helmHomePath = v
 	} else {
-		helmHomePath = helm_env.DefaultHelmHome
+		helmHomePath = v2environment.DefaultHelmHome
 	}
-	return helmpath.Home(helmHomePath)
+	return v2helmpath.Home(helmHomePath)
 }
 
-func findRepoEntry(name string, r *repo.RepoFile) (*repo.Entry, bool) {
+func findRepoEntry(name string, r *repo.File) (*repo.Entry, bool) {
 	var entry *repo.Entry
 	exists := false
 	for _, re := range r.Repositories {

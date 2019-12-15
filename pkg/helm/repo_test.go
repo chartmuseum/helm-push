@@ -2,12 +2,13 @@ package helm
 
 import (
 	"io/ioutil"
+	"os"
+	"testing"
+
 	"k8s.io/helm/pkg/getter"
 	helm_env "k8s.io/helm/pkg/helm/environment"
 	"k8s.io/helm/pkg/helm/helmpath"
 	"k8s.io/helm/pkg/repo"
-	"os"
-	"testing"
 )
 
 var (
@@ -67,7 +68,7 @@ func TestTempRepoFromURL(t *testing.T) {
 	if err != nil {
 		t.Error("unexpected error getting temp repo from URL", err)
 	}
-	if repo.URL != url {
+	if repo.Config.URL != url {
 		t.Error("expecting repo URL to match what was provided")
 	}
 
@@ -76,13 +77,13 @@ func TestTempRepoFromURL(t *testing.T) {
 	if err != nil {
 		t.Error("unexpected error getting temp repo from URL, with basic auth", err)
 	}
-	if repo.URL != "https://my.chart.repo.com/a/b/c/" {
+	if repo.Config.URL != "https://my.chart.repo.com/a/b/c/" {
 		t.Error("expecting repo URL to have basic auth removed")
 	}
-	if repo.Username != "user" {
+	if repo.Config.Username != "user" {
 		t.Error("expecting repo username to be extracted from URL")
 	}
-	if repo.Password != "p@ss" {
+	if repo.Config.Password != "p@ss" {
 		t.Error("expecting repo password to be extracted from URL")
 	}
 }

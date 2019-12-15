@@ -1,11 +1,10 @@
 package chartmuseum
 
 import (
-	"crypto/tls"
 	"fmt"
 	"net/http"
 
-	"k8s.io/helm/pkg/tlsutil"
+	v2tlsutil "k8s.io/helm/pkg/tlsutil"
 )
 
 type (
@@ -52,46 +51,14 @@ func NewClient(opts ...Option) (*Client, error) {
 func newTransport(certFile, keyFile, caFile string, insecureSkipVerify bool) (*http.Transport, error) {
 	transport := &http.Transport{}
 
-	tlsConf, err := NewClientTLS(certFile, keyFile, caFile, insecureSkipVerify)
+	tlsConf, err := v2tlsutil.NewClientTLS(certFile, keyFile, caFile)
 	if err != nil {
 		return nil, fmt.Errorf("can't create TLS config: %s", err.Error())
 	}
+	tlsConf.InsecureSkipVerify = insecureSkipVerify
 
 	transport.TLSClientConfig = tlsConf
 	transport.Proxy = http.ProxyFromEnvironment
 
 	return transport, nil
-}
-
-//The fix for CA file has not been included in any formal release,
-//so copy code here. Once it's released, we can use method 'NewClientTLS'
-//in the pkg/tlsutil package to replace this copy code.
-//For more details, please refer https://github.com/helm/helm/pull/3258
-func newTLSConfigCommon(certFile, keyFile, caFile string, insecureSkipVerify bool) (*tls.Config, error) {
-	config := tls.Config{
-		InsecureSkipVerify: insecureSkipVerify,
-	}
-
-	if certFile != "" && keyFile != "" {
-		cert, err := tlsutil.CertFromFilePair(certFile, keyFile)
-		if err != nil {
-			return nil, err
-		}
-		config.Certificates = []tls.Certificate{*cert}
-	}
-
-	if !insecureSkipVerify && caFile != "" {
-		cp, err := tlsutil.CertPoolFromFile(caFile)
-		if err != nil {
-			return nil, err
-		}
-		config.RootCAs = cp
-	}
-
-	return &config, nil
-}
-
-// NewClientTLS returns tls.Config appropriate for client auth.
-func NewClientTLS(certFile, keyFile, caFile string, insecureSkipVerify bool) (*tls.Config, error) {
-	return newTLSConfigCommon(certFile, keyFile, caFile, insecureSkipVerify)
 }

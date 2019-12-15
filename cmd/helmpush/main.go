@@ -16,15 +16,17 @@ import (
 	"strconv"
 	"strings"
 
-	"k8s.io/helm/pkg/chartutil"
-
 	cm "github.com/chartmuseum/helm-push/pkg/chartmuseum"
 	"github.com/chartmuseum/helm-push/pkg/helm"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
-	"k8s.io/helm/pkg/downloader"
-	"k8s.io/helm/pkg/getter"
-	helmEnv "k8s.io/helm/pkg/helm/environment"
+	"helm.sh/helm/v3/pkg/chartutil"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/downloader"
+	"helm.sh/helm/v3/pkg/getter"
+	v2downloader "k8s.io/helm/pkg/downloader"
+	v2getter "k8s.io/helm/pkg/getter"
+	v2environment "k8s.io/helm/pkg/helm/environment"
 )
 
 type (
@@ -39,6 +41,7 @@ type (
 		contextPath        string
 		forceUpload        bool
 		useHTTP            bool
+		checkHelmVersion   bool
 		caFile             string
 		certFile           string
 		keyFile            string
@@ -60,7 +63,8 @@ type (
 )
 
 var (
-	settings    helmEnv.EnvSettings
+	v2settings  v2environment.EnvSettings
+	settings    = cli.New()
 	globalUsage = `Helm plugin to push chart package to ChartMuseum
 
 Examples:
@@ -80,6 +84,12 @@ func newPushCmd(args []string) *cobra.Command {
 		Long:         globalUsage,
 		SilenceUsage: true,
 		RunE: func(cmd *cobra.Command, args []string) error {
+
+			// If the --check-helm-version flag is provided, short circuit
+			if p.checkHelmVersion {
+				fmt.Println(helm.HelmMajorVersionCurrent())
+				return nil
+			}
 
 			p.out = cmd.OutOrStdout()
 
@@ -112,11 +122,12 @@ func newPushCmd(args []string) *cobra.Command {
 	f.BoolVarP(&p.insecureSkipVerify, "insecure", "", false, "Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]")
 	f.BoolVarP(&p.forceUpload, "force", "f", false, "Force upload even if chart version exists")
 	f.BoolVarP(&p.dependencyUpdate, "dependency-update", "d", false, `update dependencies from "requirements.yaml" to dir "charts/" before packaging`)
+	f.BoolVarP(&p.checkHelmVersion, "check-helm-version", "", false, `outputs either "2" or "3" indicating the current Helm major version`)
 
 	f.Parse(args)
 
-	settings.AddFlags(f)
-	settings.Init(f)
+	v2settings.AddFlags(f)
+	v2settings.Init(f)
 
 	return cmd
 }
@@ -191,7 +202,7 @@ func (p *pushCmd) push() error {
 	// instead of looking for the entry in the local repository list
 	if regexp.MustCompile(`^https?://`).MatchString(p.repoName) {
 		repo, err = helm.TempRepoFromURL(p.repoName)
-		p.repoName = repo.URL
+		p.repoName = repo.Config.URL
 	} else {
 		repo, err = helm.GetRepoByName(p.repoName)
 	}
@@ -214,16 +225,29 @@ func (p *pushCmd) push() error {
 			if err != nil {
 				return err
 			}
-			downloadManager := &downloader.Manager{
-				Out:       p.out,
-				ChartPath: chartPath,
-				HelmHome:  settings.Home,
-				Keyring:   p.keyring,
-				Getters:   getter.All(settings),
-				Debug:     settings.Debug,
-			}
-			if err := downloadManager.Update(); err != nil {
-				return err
+			if helm.HelmMajorVersionCurrent() == helm.HelmMajorVersion2 {
+				v2downloadManager := &v2downloader.Manager{
+					Out:       p.out,
+					ChartPath: chartPath,
+					HelmHome:  v2settings.Home,
+					Keyring:   p.keyring,
+					Getters:   v2getter.All(v2settings),
+					Debug:     v2settings.Debug,
+				}
+				if err := v2downloadManager.Update(); err != nil {
+					return err
+				}
+			} else {
+				downloadManager := &downloader.Manager{
+					Out:       p.out,
+					ChartPath: chartPath,
+					Keyring:   p.keyring,
+					Getters:   getter.All(settings),
+					Debug:     v2settings.Debug,
+				}
+				if err := downloadManager.Update(); err != nil {
+					return err
+				}
 			}
 		}
 	}
@@ -239,8 +263,8 @@ func (p *pushCmd) push() error {
 	}
 
 	// username/password override(s)
-	username := repo.Username
-	password := repo.Password
+	username := repo.Config.Username
+	password := repo.Config.Password
 	if p.username != "" {
 		username = p.username
 	}
@@ -251,9 +275,9 @@ func (p *pushCmd) push() error {
 	// in case the repo is stored with cm:// protocol, remove it
 	var url string
 	if p.useHTTP {
-		url = strings.Replace(repo.URL, "cm://", "http://", 1)
+		url = strings.Replace(repo.Config.URL, "cm://", "http://", 1)
 	} else {
-		url = strings.Replace(repo.URL, "cm://", "https://", 1)
+		url = strings.Replace(repo.Config.URL, "cm://", "https://", 1)
 	}
 
 	client, err := cm.NewClient(

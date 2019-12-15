@@ -1,8 +1,9 @@
 package helm
 
 import (
-	"k8s.io/helm/pkg/chartutil"
-	"k8s.io/helm/pkg/proto/hapi/chart"
+	"helm.sh/helm/v3/pkg/chart"
+	"helm.sh/helm/v3/pkg/chart/loader"
+	"helm.sh/helm/v3/pkg/chartutil"
 )
 
 type (
@@ -20,7 +21,7 @@ func (c *Chart) SetVersion(version string) {
 // GetChartByName returns a chart by "name", which can be
 // either a directory or .tgz package
 func GetChartByName(name string) (*Chart, error) {
-	cc, err := chartutil.Load(name)
+	cc, err := loader.Load(name)
 	if err != nil {
 		return nil, err
 	}
