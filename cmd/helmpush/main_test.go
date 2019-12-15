@@ -49,7 +49,7 @@ func TestPushCmd(t *testing.T) {
 	entry.Name = "helm-push-test"
 	entry.URL = ts.URL
 
-	_, err = repo.NewChartRepository(&entry, getter.All(settings))
+	_, err = repo.NewChartRepository(&entry, getter.All(v2settings))
 	if err != nil {
 		t.Error("unexpected error created test repository", err)
 	}
@@ -193,7 +193,7 @@ func TestPushCmdWithTlsEnabledServer(t *testing.T) {
 	entry.Name = "helm-push-test"
 	entry.URL = ts.URL
 
-	_, err = repo.NewChartRepository(&entry, getter.All(settings))
+	_, err = repo.NewChartRepository(&entry, getter.All(v2settings))
 	if err != nil {
 		t.Error("unexpected error created test repository", err)
 	}
