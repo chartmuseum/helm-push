@@ -3,7 +3,7 @@ kind: Service
 metadata:
   name: {{ include "my-v3-chart.fullname" . }}
   labels:
-{{ include "my-v3-chart.labels" . | indent 4 }}
+    {{- include "my-v3-chart.labels" . | nindent 4 }}
 spec:
   type: {{ .Values.service.type }}
   ports:
@@ -12,5 +12,4 @@ spec:
       protocol: TCP
       name: http
   selector:
-    app.kubernetes.io/name: {{ include "my-v3-chart.name" . }}
-    app.kubernetes.io/instance: {{ .Release.Name }}
+    {{- include "my-v3-chart.selectorLabels" . | nindent 4 }}

@@ -1,12 +1,12 @@
 package helm
 
 import (
-	"io/ioutil"
 	"fmt"
+	"io/ioutil"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
-	"k8s.io/helm/pkg/repo"
+	"helm.sh/helm/v3/pkg/repo"
 )
 
 type (

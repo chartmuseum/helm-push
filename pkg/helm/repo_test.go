@@ -2,12 +2,13 @@ package helm
 
 import (
 	"io/ioutil"
+	"os"
+	"testing"
+
 	"k8s.io/helm/pkg/getter"
 	helm_env "k8s.io/helm/pkg/helm/environment"
 	"k8s.io/helm/pkg/helm/helmpath"
 	"k8s.io/helm/pkg/repo"
-	"os"
-	"testing"
 )
 
 var (

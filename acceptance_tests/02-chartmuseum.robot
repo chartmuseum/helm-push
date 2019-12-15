@@ -19,6 +19,7 @@ Test ChartMuseum integration
     [Arguments]    ${version}
     set helm version    ${version}
     install helm plugin
+    helm major version detected by plugin is  ${version}
     Chart directory can be pushed to ChartMuseum
     Chart directory can be pushed to ChartMuseum with custom version
     Chart package can be pushed to ChartMuseum

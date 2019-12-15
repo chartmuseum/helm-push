@@ -6,7 +6,6 @@ replicaCount: 1
 
 image:
   repository: nginx
-  tag: stable
   pullPolicy: IfNotPresent
 
 imagePullSecrets: []
@@ -43,7 +42,6 @@ ingress:
   hosts:
     - host: chart-example.local
       paths: []
-
   tls: []
   #  - secretName: chart-example-tls
   #    hosts:

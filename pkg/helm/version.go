@@ -14,7 +14,14 @@ const (
 	HelmMajorVersion3 = 3
 )
 
-func GetHelmMajorVersion() HelmMajorVersion {
+var (
+	helmMajorVersionCurrent HelmMajorVersion
+)
+
+func HelmMajorVersionCurrent() HelmMajorVersion {
+	if helmMajorVersionCurrent != 0 {
+		return helmMajorVersionCurrent
+	}
 	helmBin, helmBinVarSet := os.LookupEnv("HELM_BIN")
 	if !helmBinVarSet {
 		helmBin = "helm"
@@ -22,7 +29,9 @@ func GetHelmMajorVersion() HelmMajorVersion {
 	helmVersion2CheckCmd := exec.Command(helmBin, "version", "-c", "--tls")
 	err := helmVersion2CheckCmd.Run()
 	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
-		return HelmMajorVersion3
+		helmMajorVersionCurrent = HelmMajorVersion3
+	} else {
+		helmMajorVersionCurrent = HelmMajorVersion2
 	}
-	return HelmMajorVersion2
+	return helmMajorVersionCurrent
 }

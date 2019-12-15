@@ -3,31 +3,29 @@ kind: Deployment
 metadata:
   name: {{ include "my-v3-chart.fullname" . }}
   labels:
-{{ include "my-v3-chart.labels" . | indent 4 }}
+    {{- include "my-v3-chart.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      app.kubernetes.io/name: {{ include "my-v3-chart.name" . }}
-      app.kubernetes.io/instance: {{ .Release.Name }}
+      {{- include "my-v3-chart.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        app.kubernetes.io/name: {{ include "my-v3-chart.name" . }}
-        app.kubernetes.io/instance: {{ .Release.Name }}
+        {{- include "my-v3-chart.selectorLabels" . | nindent 8 }}
     spec:
     {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
     {{- end }}
-      serviceAccountName: {{ template "my-v3-chart.serviceAccountName" . }}
+      serviceAccountName: {{ include "my-v3-chart.serviceAccountName" . }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
         - name: {{ .Chart.Name }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
-          image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+          image: "{{ .Values.image.repository }}:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           ports:
             - name: http

@@ -6,9 +6,11 @@ class Helm(common.CommandRunner):
     def set_helm_version(self, version):
         version = str(version)
         if version == '2':
-            common.HELM_EXE = 'HELM_HOME=%s helm2' % os.getenv('TEST_HELM_HOME', '')
+            common.HELM_EXE = 'HELM_HOME=%s helm2' % os.getenv('TEST_V2_HELM_HOME', '')
         elif version == '3':
-            common.HELM_EXE = 'helm3'
+            common.HELM_EXE = 'XDG_CACHE_HOME=%s XDG_CONFIG_HOME=%s XDG_DATA_HOME=%s helm3' % \
+                (os.getenv('TEST_V3_XDG_CACHE_HOME', ''), os.getenv('TEST_V3_XDG_CONFIG_HOME', ''),
+                    os.getenv('TEST_V3_XDG_DATA_HOME', ''))
         else:
             raise Exception('invalid Helm version provided: %s' % version)
 

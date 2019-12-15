@@ -4,13 +4,14 @@ import (
 	"fmt"
 	urllib "net/url"
 	"os"
+	"path/filepath"
 	"strings"
 
 	"helm.sh/helm/v3/pkg/cli"
 	"helm.sh/helm/v3/pkg/getter"
 	"helm.sh/helm/v3/pkg/repo"
-	helm_env "k8s.io/helm/pkg/helm/environment"
-	"k8s.io/helm/pkg/helm/helmpath"
+	v2environment "k8s.io/helm/pkg/helm/environment"
+	v2helmpath "k8s.io/helm/pkg/helm/helmpath"
 )
 
 type (
@@ -30,10 +31,19 @@ func GetRepoByName(name string) (*Repo, error) {
 	if !exists {
 		return nil, fmt.Errorf("no repo named %q found", name)
 	}
-	cr, err := repo.NewChartRepository(entry, getter.All(cli.New()))
+
+	settings := cli.New()
+	getters := getter.All(settings)
+	cr, err := repo.NewChartRepository(entry, getters)
 	if err != nil {
 		return nil, err
 	}
+
+	if HelmMajorVersionCurrent() == HelmMajorVersion2 {
+		home := v2helmHome()
+		cr.CachePath = filepath.Join(home.Repository(), "cache")
+	}
+
 	return &Repo{cr}, nil
 }
 
@@ -62,27 +72,25 @@ func TempRepoFromURL(url string) (*Repo, error) {
 
 func repoFile() (*repo.File, error) {
 	var repoFilePath string
-	helmMajorVersion := GetHelmMajorVersion()
-	if helmMajorVersion == HelmMajorVersion2 {
-		home := helmHome()
+	if HelmMajorVersionCurrent() == HelmMajorVersion2 {
+		home := v2helmHome()
 		repoFilePath = home.RepositoryFile()
 	} else {
-		// TODO: fix, this only works for default mac
-		userHome, _ := os.UserHomeDir()
-		repoFilePath = fmt.Sprintf("%s/Library/Preferences/helm/repositories.yaml", userHome)
+		settings := cli.New()
+		repoFilePath = settings.RepositoryConfig
 	}
 	repoFile, err := repo.LoadFile(repoFilePath)
 	return repoFile, err
 }
 
-func helmHome() helmpath.Home {
+func v2helmHome() v2helmpath.Home {
 	var helmHomePath string
 	if v, ok := os.LookupEnv("HELM_HOME"); ok {
 		helmHomePath = v
 	} else {
-		helmHomePath = helm_env.DefaultHelmHome
+		helmHomePath = v2environment.DefaultHelmHome
 	}
-	return helmpath.Home(helmHomePath)
+	return v2helmpath.Home(helmHomePath)
 }
 
 func findRepoEntry(name string, r *repo.File) (*repo.Entry, bool) {
