@@ -2,7 +2,7 @@
 
 HELM_V2_VERSION="v2.16.1"
 HELM_V3_VERSION="v3.0.1"
-CHARTMUSEUM_VERSION="latest"
+CHARTMUSEUM_VERSION="v0.11.0"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../
