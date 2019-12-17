@@ -15,8 +15,8 @@ func TestSetVersion(t *testing.T) {
 		t.Error("unexpected error getting test tarball chart", err)
 	}
 	c.SetVersion("latest")
-	if c.Metadata.Version != "latest" {
-		t.Errorf("expected chart version to be latest, instead got %s", c.Metadata.Version)
+	if c.V2.Metadata.Version != "latest" {
+		t.Errorf("expected chart version to be latest, instead got %s", c.V2.Metadata.Version)
 	}
 }
 
@@ -32,11 +32,11 @@ func TestGetChartByName(t *testing.T) {
 	if err != nil {
 		t.Error("unexpected error getting test tarball chart", err)
 	}
-	if c.Metadata.Name != "mychart" {
-		t.Errorf("expexted chart name to be mychart, instead got %s", c.Metadata.Name)
+	if c.V2.Metadata.Name != "mychart" {
+		t.Errorf("expexted chart name to be mychart, instead got %s", c.V2.Metadata.Name)
 	}
-	if c.Metadata.Version != "0.1.0" {
-		t.Errorf("expexted chart version to be 0.1.0, instead got %s", c.Metadata.Version)
+	if c.V2.Metadata.Version != "0.1.0" {
+		t.Errorf("expexted chart version to be 0.1.0, instead got %s", c.V2.Metadata.Version)
 	}
 }
 

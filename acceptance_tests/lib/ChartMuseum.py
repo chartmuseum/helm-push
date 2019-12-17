@@ -35,7 +35,7 @@ class ChartMuseum(common.CommandRunner):
             self.run_command('(cd %s && mkdir -p tmp && tar -xf *.tgz --directory tmp && find tmp -name values.schema.json | grep values.schema.json)' % common.STORAGE_DIR)
         else:
             # Check for requirements.yaml in Helm 2 (a Helm 2-specific file)
-            self.run_command('(cd %s && mkdir -p tmp && tar -xf *.tgz --directory tmp && find tmp -name grep requirements.yaml | grep requirements.yaml)' % common.STORAGE_DIR)
+            self.run_command('(cd %s && mkdir -p tmp && tar -xf *.tgz --directory tmp && find tmp -name requirements.yaml | grep requirements.yaml)' % common.STORAGE_DIR)
 
     def clear_chartmuseum_storage(self):
         self.run_command('rm %s*.tgz' % common.STORAGE_DIR)
