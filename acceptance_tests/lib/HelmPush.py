@@ -3,9 +3,14 @@ import common
 
 class HelmPush(common.CommandRunner):
     def _testchart_path(self):
-        if 'helm3' in common.HELM_EXE:
+        if common.USE_OPPOSITE_VERSION:
+            if 'helm3' in common.HELM_EXE:
+                return '%s/helm2/mychart' % common.TESTCHARTS_DIR
             return '%s/helm3/my-v3-chart' % common.TESTCHARTS_DIR
-        return '%s/helm2/mychart' % common.TESTCHARTS_DIR
+        else:
+            if 'helm3' in common.HELM_EXE:
+                return '%s/helm3/my-v3-chart' % common.TESTCHARTS_DIR
+            return '%s/helm2/mychart' % common.TESTCHARTS_DIR
 
     def helm_major_version_detected_by_plugin_is(self, version):
         cmd = '%s push --check-helm-version' % common.HELM_EXE

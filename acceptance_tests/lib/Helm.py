@@ -14,6 +14,12 @@ class Helm(common.CommandRunner):
         else:
             raise Exception('invalid Helm version provided: %s' % version)
 
+    def use_test_chart_built_by_same_helm_version(self):
+        common.USE_OPPOSITE_VERSION = False
+
+    def use_test_chart_built_by_opposite_helm_version(self):
+        common.USE_OPPOSITE_VERSION = True
+
     def add_chart_repo(self):
         self.remove_chart_repo()
         self.run_command('%s repo add %s %s' % (common.HELM_EXE, common.HELM_REPO_NAME, common.HELM_REPO_URL))

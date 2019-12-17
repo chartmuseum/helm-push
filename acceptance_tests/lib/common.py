@@ -11,6 +11,7 @@ ACCEPTANCE_DIR = '.acceptance/'
 STORAGE_DIR = os.path.join(ACCEPTANCE_DIR, 'storage/')
 LOGFILE = '.chartmuseum.log'
 HELM_EXE = 'HELM_HOME=%s helm2' % os.getenv('TEST_HELM_HOME', '')
+USE_OPPOSITE_VERSION = False
 
 
 class CommandRunner(object):
