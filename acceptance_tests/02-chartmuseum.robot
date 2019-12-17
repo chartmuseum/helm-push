@@ -20,6 +20,7 @@ Test ChartMuseum integration
     set helm version    ${version}
     install helm plugin
     helm major version detected by plugin is  ${version}
+    clear chartmuseum storage
     Chart directory can be pushed to ChartMuseum
     Chart directory can be pushed to ChartMuseum with custom version
     Chart package can be pushed to ChartMuseum
@@ -30,6 +31,8 @@ Chart directory can be pushed to ChartMuseum
     push chart directory
     HelmPush.return code should be   0
     package exists in chartmuseum storage
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
@@ -37,6 +40,8 @@ Chart directory can be pushed to ChartMuseum
     push chart directory to url
     HelmPush.return code should be   0
     package exists in chartmuseum storage
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
@@ -45,6 +50,8 @@ Chart directory can be pushed to ChartMuseum with custom version
     push chart directory    latest
     HelmPush.return code should be   0
     package exists in chartmuseum storage   latest
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
@@ -52,6 +59,8 @@ Chart directory can be pushed to ChartMuseum with custom version
     push chart directory to url    latest
     HelmPush.return code should be   0
     package exists in chartmuseum storage   latest
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
@@ -60,6 +69,8 @@ Chart package can be pushed to ChartMuseum
     push chart package
     HelmPush.return code should be   0
     package exists in chartmuseum storage
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
@@ -67,6 +78,8 @@ Chart package can be pushed to ChartMuseum
     push chart package to url
     HelmPush.return code should be   0
     package exists in chartmuseum storage
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
@@ -75,6 +88,8 @@ Chart package can be pushed to ChartMuseum with custom version
     push chart package  latest
     HelmPush.return code should be   0
     package exists in chartmuseum storage   latest
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
@@ -82,6 +97,8 @@ Chart package can be pushed to ChartMuseum with custom version
     push chart package to url  latest
     HelmPush.return code should be   0
     package exists in chartmuseum storage   latest
+    package contains expected files
+    HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
