@@ -103,7 +103,7 @@ In ChartMuseum server (>0.7.1) this will automatically be added to index.yaml if
 ### Basic Auth
 If you have added your repo with the `--username`/`--password` flags (Helm 2.9+), or have added your repo with the basic auth username/password in the URL (e.g. `https://myuser:mypass@my.chart.repo.com`), no further setup is required.
 
-The plugin will use the auth info located in `~/.helm/repository/repositories.yaml` in order to authenticate.
+The plugin will use the auth info located in `~/.helm/repository/repositories.yaml` (for Helm 2) or `~/.config/helm/repositories.yaml` (for Helm 3) in order to authenticate.
 
 If you are running ChartMuseum with `AUTH_ANONYMOUS_GET=true`, and have added your repo without authentication, the plugin recognizes the following environment variables for basic auth on push operations:
 ```
