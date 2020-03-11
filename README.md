@@ -9,7 +9,7 @@ Helm plugin to push chart package to [ChartMuseum](https://github.com/helm/chart
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
 
 ```
-$ helm plugin install https://github.com/chartmuseum/helm-push
+$ helm plugin install https://github.com/chartmuseum/helm-push.git
 Downloading and installing helm-push v0.8.1 ...
 https://github.com/chartmuseum/helm-push/releases/download/v0.8.1/helm-push_0.8.1_darwin_amd64.tar.gz
 Installed plugin: push
