@@ -82,7 +82,7 @@ func newPushCmd(args []string) *cobra.Command {
 		Use:          "helm push",
 		Short:        "Helm plugin to push chart package to ChartMuseum",
 		Long:         globalUsage,
-		SilenceUsage: true,
+		SilenceUsage: false,
 		RunE: func(cmd *cobra.Command, args []string) error {
 
 			// If the --check-helm-version flag is provided, short circuit
