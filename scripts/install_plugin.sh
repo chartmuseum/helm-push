@@ -23,9 +23,6 @@ if [ ! -f ${RELEASE_PACKAGE} ]; then
 
     echo $url
 
-    mkdir -p "bin"
-    mkdir -p "releases/v${version}"
-
     # Download with curl if possible.
     if [ -x "$(which curl 2>/dev/null)" ]; then
         curl -sSL "${url}" -o ${RELEASE_PACKAGE}
@@ -35,6 +32,9 @@ if [ ! -f ${RELEASE_PACKAGE} ]; then
 else
     echo "helm-push already exist..."
 fi
+
+mkdir -p "bin"
+mkdir -p "releases/v${version}"
 
 tar xzf ${RELEASE_PACKAGE} -C "releases/v${version}"
 mv "releases/v${version}/bin/helmpush" "bin/helmpush" || \
