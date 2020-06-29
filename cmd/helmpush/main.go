@@ -316,6 +316,9 @@ func (p *pushCmd) push() error {
 	if err != nil {
 		return err
 	}
+	if strings.HasSuffix(p.chartName, ".tgz") {
+		chartPackagePath = p.chartName
+	}
 
 	fmt.Printf("Pushing %s to %s...\n", filepath.Base(chartPackagePath), p.repoName)
 	resp, err := client.UploadChartPackage(chartPackagePath, p.forceUpload)
