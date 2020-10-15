@@ -1,5 +1,5 @@
 # helm push plugin
-<img align="right" src="https://github.com/helm/chartmuseum/raw/master/logo.png">
+<img align="right" src="https://github.com/helm/chartmuseum/raw/main/logo.png">
 
 [![GitHub Actions status](https://github.com/chartmuseum/helm-push/workflows/build/badge.svg)](https://github.com/chartmuseum/helm-push/actions?query=workflow%3Abuild)
 
