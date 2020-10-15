@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-PY_REQUIRES="robotframework==3.1.2"
+PY_REQUIRES="robotframework==3.2.2"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../

@@ -1,8 +1,8 @@
 #!/bin/bash -ex
 
-HELM_V2_VERSION="v2.16.1"
-HELM_V3_VERSION="v3.0.1"
-CHARTMUSEUM_VERSION="v0.11.0"
+HELM_V2_VERSION="v2.16.12"
+HELM_V3_VERSION="v3.3.4"
+CHARTMUSEUM_VERSION="v0.12.0"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../
@@ -26,7 +26,7 @@ install_helm_v2() {
     if [ ! -f "testbin/helm2" ]; then
         mkdir -p testbin/
         TARBALL="helm-${HELM_V2_VERSION}-${PLATFORM}-amd64.tar.gz"
-        wget "https://get.helm.sh/${TARBALL}"
+        curl -LO "https://get.helm.sh/${TARBALL}"
         tar -C testbin/ -xzf $TARBALL
         rm -f $TARBALL
         pushd testbin/
@@ -44,7 +44,7 @@ install_helm_v3() {
     if [ ! -f "testbin/helm3" ]; then
         mkdir -p testbin/
         TARBALL="helm-${HELM_V3_VERSION}-${PLATFORM}-amd64.tar.gz"
-        wget "https://get.helm.sh/${TARBALL}"
+        curl -LO "https://get.helm.sh/${TARBALL}"
         tar -C testbin/ -xzf $TARBALL
         rm -f $TARBALL
         pushd testbin/
@@ -61,7 +61,7 @@ install_chartmuseum() {
     if [ ! -f "testbin/chartmuseum" ]; then
         mkdir -p testbin/
         pushd testbin/
-        wget "https://s3.amazonaws.com/chartmuseum/release/${CHARTMUSEUM_VERSION}/bin/${PLATFORM}/amd64/chartmuseum"
+        curl -LO "https://s3.amazonaws.com/chartmuseum/release/${CHARTMUSEUM_VERSION}/bin/${PLATFORM}/amd64/chartmuseum"
         chmod +x ./chartmuseum
         popd
     fi

@@ -1,7 +1,7 @@
 # helm push plugin
 <img align="right" src="https://github.com/helm/chartmuseum/raw/master/logo.png">
 
-[![Codefresh build status]( https://g.codefresh.io/api/badges/pipeline/chartmuseum/chartmuseum%2Fhelm-push%2Fmaster?type=cf-1)]( https://g.codefresh.io/public/accounts/chartmuseum/pipelines/chartmuseum/helm-push/master)
+[![GitHub Actions status](https://github.com/chartmuseum/helm-push/workflows/build/badge.svg)](https://github.com/chartmuseum/helm-push/actions?query=workflow%3Abuild)
 
 Helm plugin to push chart package to [ChartMuseum](https://github.com/helm/chartmuseum)
 

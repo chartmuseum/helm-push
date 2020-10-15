@@ -1,0 +1,35 @@
+name: build-pr
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: setup go environment
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.15.3'
+      - name: run unit tests
+        run: make test
+      - name: build binary
+        run: make build
+      - name: run acceptance tests
+        run: make acceptance
+      - name: upload coverage report
+        uses: actions/upload-artifact@master
+        with:
+          name: helmpush-coverage-report-${{ github.sha }}
+          path: .cover/
+        if: always()
+      - name: upload acceptance report
+        uses: actions/upload-artifact@master
+        with:
+          name: helmpush-acceptance-report-${{ github.sha }}
+          path: .robot/
+        if: always()
