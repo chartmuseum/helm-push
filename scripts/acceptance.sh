@@ -22,7 +22,7 @@ export TEST_V3_XDG_CONFIG_HOME="$PWD/.helm3/xdg/config"
 export TEST_V3_XDG_DATA_HOME="$PWD/.helm3/xdg/data"
 
 if [ ! -d .venv/ ]; then
-    virtualenv -p $(which python2.7) .venv/
+    virtualenv -p $(which python3) .venv/
     .venv/bin/python .venv/bin/pip install $PY_REQUIRES
 fi
 
