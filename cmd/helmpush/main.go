@@ -272,6 +272,11 @@ func (p *pushCmd) push() error {
 		password = p.password
 	}
 
+	// unset accessToken if repo credentials are provided
+	if repo.Config.Username != "" && repo.Config.Password != "" {
+		p.accessToken = ""
+	}
+
 	// in case the repo is stored with cm:// protocol, remove it
 	var url string
 	if p.useHTTP {
