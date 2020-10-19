@@ -273,7 +273,7 @@ func (p *pushCmd) push() error {
 	}
 
 	// unset accessToken if repo credentials are provided
-	if repo.Config.Username != "" && repo.Config.Password != "" {
+	if username != "" && password != "" {
 		p.accessToken = ""
 	}
 
