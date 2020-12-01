@@ -67,6 +67,14 @@ Pushing mychart-0.3.2.tgz to chartmuseum...
 Done.
 ```
 
+If the `--force`/`-f` option is not set and the chart already exists you will get an error:
+```
+$ helm push mychart/ chartmuseum
+Pushing mychart-0.1.0.tgz to chartmuseum...
+Error: 409: mychart-0.1.0.tgz already exists
+```
+For some environnements, like in CI/CD pipelines, this error should not stop the whole pipeline and can be skipped using the `--ignore-already-exists` option.
+
 ### Pushing directly to URL
 If the second argument provided resembles a URL, you are not required to add the repo prior to push:
 ```
