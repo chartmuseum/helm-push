@@ -63,7 +63,7 @@ func TestDownloadFileFromTlsServer(t *testing.T) {
 			w.Write([]byte("hello world"))
 		}
 	}))
-	cert, err := tls.LoadX509KeyPair(testCertPath, testKeyPath)
+	cert, err := tls.LoadX509KeyPair(testServerCertPath, testServerKeyPath)
 	if err != nil {
 		t.Fatalf("failed to load certificate and key with error: %s", err.Error())
 	}
@@ -93,7 +93,7 @@ func TestDownloadFileFromTlsServer(t *testing.T) {
 		URL(ts.URL),
 		Username("user"),
 		Password("pass"),
-		CAFile(testCAPath),
+		CAFile(testServerCAPath),
 	)
 	if err != nil {
 		t.Fatalf("[with ca file] expect creating a client instance but met error: %s", err)
