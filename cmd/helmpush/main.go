@@ -32,6 +32,7 @@ import (
 type (
 	pushCmd struct {
 		chartName          string
+		appVersion         string
 		chartVersion       string
 		repoName           string
 		username           string
@@ -110,6 +111,7 @@ func newPushCmd(args []string) *cobra.Command {
 	}
 	f := cmd.Flags()
 	f.StringVarP(&p.chartVersion, "version", "v", "", "Override chart version pre-push")
+	f.StringVarP(&p.appVersion, "app-version", "a", "", "Override app version pre-push")
 	f.StringVarP(&p.username, "username", "u", "", "Override HTTP basic auth username [$HELM_REPO_USERNAME]")
 	f.StringVarP(&p.password, "password", "p", "", "Override HTTP basic auth password [$HELM_REPO_PASSWORD]")
 	f.StringVarP(&p.accessToken, "access-token", "", "", "Send token in Authorization header [$HELM_REPO_ACCESS_TOKEN]")
@@ -260,6 +262,11 @@ func (p *pushCmd) push() error {
 	// version override
 	if p.chartVersion != "" {
 		chart.SetVersion(p.chartVersion)
+	}
+
+	// app version override
+	if p.appVersion != "" {
+		chart.SetAppVersion(p.appVersion)
 	}
 
 	// username/password override(s)
