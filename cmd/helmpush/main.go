@@ -31,24 +31,25 @@ import (
 
 type (
 	pushCmd struct {
-		chartName          string
-		chartVersion       string
-		repoName           string
-		username           string
-		password           string
-		accessToken        string
-		authHeader         string
-		contextPath        string
-		forceUpload        bool
-		useHTTP            bool
-		checkHelmVersion   bool
-		caFile             string
-		certFile           string
-		keyFile            string
-		insecureSkipVerify bool
-		keyring            string
-		dependencyUpdate   bool
-		out                io.Writer
+		chartName                string
+		chartVersion             string
+		repoName                 string
+		username                 string
+		password                 string
+		accessToken              string
+		authHeader               string
+		contextPath              string
+		forceUpload              bool
+		ignoreAlreadyExistsError bool
+		useHTTP                  bool
+		checkHelmVersion         bool
+		caFile                   string
+		certFile                 string
+		keyFile                  string
+		insecureSkipVerify       bool
+		keyring                  string
+		dependencyUpdate         bool
+		out                      io.Writer
 	}
 
 	config struct {
@@ -121,6 +122,7 @@ func newPushCmd(args []string) *cobra.Command {
 	f.StringVar(&p.keyring, "keyring", defaultKeyring(), "location of a public keyring")
 	f.BoolVarP(&p.insecureSkipVerify, "insecure", "", false, "Connect to server with an insecure way by skipping certificate verification [$HELM_REPO_INSECURE]")
 	f.BoolVarP(&p.forceUpload, "force", "f", false, "Force upload even if chart version exists")
+	f.BoolVarP(&p.ignoreAlreadyExistsError, "ignore-already-exists", "", false, "Skip the already exisits error if chart version exists")
 	f.BoolVarP(&p.dependencyUpdate, "dependency-update", "d", false, `update dependencies from "requirements.yaml" to dir "charts/" before packaging`)
 	f.BoolVarP(&p.checkHelmVersion, "check-helm-version", "", false, `outputs either "2" or "3" indicating the current Helm major version`)
 
@@ -328,7 +330,7 @@ func (p *pushCmd) push() error {
 		return err
 	}
 
-	return handlePushResponse(resp)
+	return p.handlePushResponse(resp)
 }
 
 func (p *pushCmd) download(fileURL string) error {
@@ -384,13 +386,18 @@ func (p *pushCmd) download(fileURL string) error {
 	return handleDownloadResponse(resp)
 }
 
-func handlePushResponse(resp *http.Response) error {
+func (p *pushCmd) handlePushResponse(resp *http.Response) error {
 	if resp.StatusCode != 201 {
 		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
-		return getChartmuseumError(b, resp.StatusCode)
+		err = getChartmuseumError(b, resp.StatusCode)
+		if p.ignoreAlreadyExistsError && resp.StatusCode == 409 {
+			fmt.Printf("Got the following error: %s \nSkipping.\n", err)
+			return nil
+		}
+		return err
 	}
 	fmt.Println("Done.")
 	return nil
