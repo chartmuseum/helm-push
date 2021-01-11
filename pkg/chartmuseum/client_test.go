@@ -12,9 +12,9 @@ func TestNewClient(t *testing.T) {
 		Password("pass"),
 		ContextPath("/my/context/path"),
 		Timeout(60),
-		CAFile("../../testdata/tls/ca.crt"),
-		KeyFile("../../testdata/tls/test_key.key"),
-		CertFile("../../testdata/tls/test_cert.crt"),
+		CAFile("../../testdata/tls/server_ca.crt"),
+		KeyFile("../../testdata/tls/server.key"),
+		CertFile("../../testdata/tls/server.crt"),
 		InsecureSkipVerify(true),
 	)
 
@@ -42,16 +42,16 @@ func TestNewClient(t *testing.T) {
 		t.Errorf("expected timeout duration to be 1 minute, got %v", cmClient.opts.timeout)
 	}
 
-	if cmClient.opts.caFile != "../../testdata/tls/ca.crt" {
-		t.Errorf("expected ca file path to be '../../testdata/tls/ca.crt' but got %v", cmClient.opts.caFile)
+	if cmClient.opts.caFile != "../../testdata/tls/server_ca.crt" {
+		t.Errorf("expected ca file path to be '../../testdata/tls/server_ca.crt' but got %v", cmClient.opts.caFile)
 	}
 
-	if cmClient.opts.certFile != "../../testdata/tls/test_cert.crt" {
-		t.Errorf("expected cert file path to be '../../testdata/tls/test_cert.crt' but got %v", cmClient.opts.certFile)
+	if cmClient.opts.certFile != "../../testdata/tls/server.crt" {
+		t.Errorf("expected cert file path to be '../../testdata/tls/server.crt' but got %v", cmClient.opts.certFile)
 	}
 
-	if cmClient.opts.keyFile != "../../testdata/tls/test_key.key" {
-		t.Errorf("expected key file path to be '../../testdata/tls/test_key.key' but got %v", cmClient.opts.keyFile)
+	if cmClient.opts.keyFile != "../../testdata/tls/server.key" {
+		t.Errorf("expected key file path to be '../../testdata/tls/server.key' but got %v", cmClient.opts.keyFile)
 	}
 
 	if !cmClient.opts.insecureSkipVerify {
