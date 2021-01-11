@@ -18,12 +18,12 @@ import (
 
 var (
 	testTarballPath    = "../../testdata/charts/helm2/mychart/mychart-0.1.0.tgz"
-	testCertPath       = "../../testdata/tls/test_cert.crt"
-	testKeyPath        = "../../testdata/tls/test_key.key"
-	testCAPath         = "../../testdata/tls/ca.crt"
+	testServerCertPath = "../../testdata/tls/server.crt"
+	testServerKeyPath  = "../../testdata/tls/server.key"
 	testServerCAPath   = "../../testdata/tls/server_ca.crt"
-	testServerCertPath = "../../testdata/tls/test_server.crt"
-	testServerKeyPath  = "../../testdata/tls/test_server.key"
+	testClientCAPath   = "../../testdata/tls/client_ca.crt"
+	testClientCertPath = "../../testdata/tls/client.crt"
+	testClientKeyPath  = "../../testdata/tls/client.key"
 )
 
 func TestPushCmd(t *testing.T) {
@@ -160,20 +160,20 @@ func TestPushCmdWithTlsEnabledServer(t *testing.T) {
 		w.WriteHeader(statusCode)
 		w.Write([]byte(body))
 	}))
-	cert, err := tls.LoadX509KeyPair(testCertPath, testKeyPath)
+	serverCert, err := tls.LoadX509KeyPair(testServerCertPath, testServerKeyPath)
 	if err != nil {
 		t.Fatalf("failed to load certificate and key with error: %s", err.Error())
 	}
 
-	caCertPool, err := tlsutil.CertPoolFromFile(testServerCAPath)
+	clientCaCertPool, err := tlsutil.CertPoolFromFile(testClientCAPath)
 	if err != nil {
 		t.Fatalf("load server CA file failed with error: %s", err.Error())
 	}
 
 	ts.TLS = &tls.Config{
-		ClientCAs:    caCertPool,
+		ClientCAs:    clientCaCertPool,
 		ClientAuth:   tls.RequireAndVerifyClientCert,
-		Certificates: []tls.Certificate{cert},
+		Certificates: []tls.Certificate{serverCert},
 		Rand:         rand.Reader,
 	}
 	ts.StartTLS()
@@ -215,9 +215,9 @@ func TestPushCmdWithTlsEnabledServer(t *testing.T) {
 		t.Fatal("expected non nil error but got nil when run cmd without certificate option")
 	}
 
-	os.Setenv("HELM_REPO_CA_FILE", testCAPath)
-	os.Setenv("HELM_REPO_CERT_FILE", testServerCertPath)
-	os.Setenv("HELM_REPO_KEY_FILE", testServerKeyPath)
+	os.Setenv("HELM_REPO_CA_FILE", testServerCAPath)
+	os.Setenv("HELM_REPO_CERT_FILE", testClientCertPath)
+	os.Setenv("HELM_REPO_KEY_FILE", testClientKeyPath)
 
 	err = cmd.RunE(cmd, args)
 	if err != nil {

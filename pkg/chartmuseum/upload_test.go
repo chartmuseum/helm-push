@@ -14,12 +14,12 @@ import (
 
 var (
 	testTarballPath    = "../../testdata/charts/helm2/mychart/mychart-0.1.0.tgz"
-	testCertPath       = "../../testdata/tls/test_cert.crt"
-	testKeyPath        = "../../testdata/tls/test_key.key"
-	testCAPath         = "../../testdata/tls/ca.crt"
+	testServerCertPath = "../../testdata/tls/server.crt"
+	testServerKeyPath  = "../../testdata/tls/server.key"
 	testServerCAPath   = "../../testdata/tls/server_ca.crt"
-	testServerCertPath = "../../testdata/tls/test_server.crt"
-	testServerKeyPath  = "../../testdata/tls/test_server.key"
+	testClientCAPath   = "../../testdata/tls/client_ca.crt"
+	testClientCertPath = "../../testdata/tls/client.crt"
+	testClientKeyPath  = "../../testdata/tls/client.key"
 )
 
 func TestUploadChartPackage(t *testing.T) {
@@ -160,7 +160,7 @@ func TestUploadChartPackageWithTlsServer(t *testing.T) {
 		}
 	}))
 
-	cert, err := tls.LoadX509KeyPair(testCertPath, testKeyPath)
+	cert, err := tls.LoadX509KeyPair(testServerCertPath, testServerKeyPath)
 	if err != nil {
 		t.Fatalf("failed to load certificate and key with error: %s", err.Error())
 	}
@@ -213,7 +213,7 @@ func TestUploadChartPackageWithTlsServer(t *testing.T) {
 		Username("user"),
 		Password("pass"),
 		ContextPath("/my/context/path"),
-		CAFile(testCAPath),
+		CAFile(testServerCAPath),
 	)
 	if err != nil {
 		t.Fatalf("[upload with ca file] expect creating a client instance but met error: %s", err)
@@ -240,18 +240,18 @@ func TestUploadChartPackageWithVerifyingClientCert(t *testing.T) {
 		}
 	}))
 
-	cert, err := tls.LoadX509KeyPair(testCertPath, testKeyPath)
+	cert, err := tls.LoadX509KeyPair(testServerCertPath, testServerKeyPath)
 	if err != nil {
 		t.Fatalf("failed to load certificate and key with error: %s", err.Error())
 	}
 
-	caCertPool, err := tlsutil.CertPoolFromFile(testServerCAPath)
+	clientCaCertPool, err := tlsutil.CertPoolFromFile(testClientCAPath)
 	if err != nil {
 		t.Fatalf("load server CA file failed with error: %s", err.Error())
 	}
 
 	ts.TLS = &tls.Config{
-		ClientCAs:    caCertPool,
+		ClientCAs:    clientCaCertPool,
 		ClientAuth:   tls.RequireAndVerifyClientCert,
 		Certificates: []tls.Certificate{cert},
 		Rand:         rand.Reader,
@@ -265,9 +265,9 @@ func TestUploadChartPackageWithVerifyingClientCert(t *testing.T) {
 		Username("user"),
 		Password("pass"),
 		ContextPath("/my/context/path"),
-		KeyFile(testServerKeyPath),
-		CertFile(testServerCertPath),
-		CAFile(testCAPath),
+		KeyFile(testClientKeyPath),
+		CertFile(testClientCertPath),
+		CAFile(testServerCAPath),
 	)
 	if err != nil {
 		t.Fatalf("[upload with cert and key files] expect creating a client instance but met error: %s", err)
