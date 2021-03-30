@@ -27,6 +27,19 @@ build_linux:
 link_linux:
 	@cp bin/linux/amd64/helmpush ./bin/helmpush
 
+
+build_linux_arm: export GOARCH=arm64
+build_linux_arm: export CGO_ENABLED=0
+build_linux_arm: export GO111MODULE=on
+build_linux_arm: export GOPROXY=https://gocenter.io
+build_linux_arm:
+	@GOOS=linux go build -v --ldflags="-w -X main.Version=$(VERSION) -X main.Revision=$(REVISION)" \
+		-o bin/linux/arm64/helmpusharm cmd/helmpush/main.go  # linux
+
+link_linux_arm:
+	@cp bin/linux/arm64/helmpusharm ./bin/helmpusharm
+
+
 build_mac: export GOARCH=amd64
 build_mac: export CGO_ENABLED=0
 build_mac: export GO111MODULE=on

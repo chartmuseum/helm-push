@@ -1,0 +1,25 @@
+name: build
+
+on:
+  push:
+    branches:
+      - feat/tag-v0.9.0-arm
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: setup go environment
+        uses: actions/setup-go@v1
+        with:
+          go-version: '1.15.3'
+      - name: build armbinary
+        run: make build_linux_arm link_linux_arm
+      - name: upload linux armbinary
+        uses: actions/upload-artifact@master
+        with:
+          name: helmpush-arm
+          path: ./bin
+        if: always()

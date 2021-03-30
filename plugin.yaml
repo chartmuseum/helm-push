@@ -11,3 +11,10 @@ useTunnel: false
 hooks:
   install: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"
   update: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"
+platformCommand:
+  - os: linux
+    arch: arm64
+    command: "$HELM_PLUGIN_DIR/bin/helmpusharm"
+  - os: linux
+    arch: amd64
+    command: "$HELM_PLUGIN_DIR/bin/helmpush"
