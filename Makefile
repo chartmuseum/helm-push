@@ -15,6 +15,7 @@ build_windows:
 
 link_windows:
 	@cp bin/windows/amd64/helmpush ./bin/helmpush
+	@cp scripts/install_plugin.sh ./scripts/install_plugin.sh
 
 build_linux: export GOARCH=amd64
 build_linux: export CGO_ENABLED=0
@@ -26,6 +27,7 @@ build_linux:
 
 link_linux:
 	@cp bin/linux/amd64/helmpush ./bin/helmpush
+	@cp scripts/install_plugin.sh ./scripts/install_plugin.sh
 
 build_mac: export GOARCH=amd64
 build_mac: export CGO_ENABLED=0
@@ -38,6 +40,7 @@ build_mac:
 
 link_mac:
 	@cp bin/darwin/amd64/helmpush ./bin/helmpush
+	@cp scripts/install_plugin.sh ./scripts/install_plugin.sh
 
 .PHONY: clean
 clean:
