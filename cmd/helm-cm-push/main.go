@@ -27,6 +27,8 @@ import (
 	v2downloader "k8s.io/helm/pkg/downloader"
 	v2getter "k8s.io/helm/pkg/getter"
 	v2environment "k8s.io/helm/pkg/helm/environment"
+	
+	"golang.org/x/crypto/ssh/terminal"
 )
 
 type (
@@ -280,6 +282,15 @@ func (p *pushCmd) push() error {
 	if p.password != "" {
 		password = p.password
 	}
+	
+	if username != "" && password == "" {
+		fmt.Printf("Enter password for %s: ", username)
+		bytePassword, err := terminal.ReadPassword(0)
+    	if err == nil {
+    		fmt.Println()
+    		password = strings.TrimSpace(string(bytePassword))
+    	}
+   	}
 
 	// unset accessToken if repo credentials are provided
 	if username != "" && password != "" {
