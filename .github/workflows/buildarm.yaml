@@ -1,9 +1,10 @@
-name: build
+name: build-arm
 
 on:
   push:
     branches:
       - feat/tag-v0.9.0-arm
+      - feat/tag-v0.9.0-arm-stash
 
 jobs:
   build:
