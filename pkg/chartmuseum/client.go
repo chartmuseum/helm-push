@@ -27,7 +27,6 @@ func (client *Client) Option(opts ...Option) *Client {
 func NewClient(opts ...Option) (*Client, error) {
 	var client Client
 	client.Client = &http.Client{}
-	client.Option(Timeout(30))
 	client.Option(opts...)
 	client.Timeout = client.opts.timeout
 
