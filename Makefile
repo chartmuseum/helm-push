@@ -8,7 +8,7 @@ build: build_linux build_mac build_windows
 
 build_windows: export GOARCH=amd64
 build_windows: export GO111MODULE=on
-build_windows: export GOPROXY=https://gocenter.io
+build_windows: export GOPROXY=$(MOD_PROXY_URL)
 build_windows:
 	@GOOS=windows go build -v --ldflags="-w -X main.Version=$(VERSION) -X main.Revision=$(REVISION)" \
 		-o bin/windows/amd64/helmpush cmd/helmpush/main.go  # windows
@@ -19,7 +19,7 @@ link_windows:
 build_linux: export GOARCH=amd64
 build_linux: export CGO_ENABLED=0
 build_linux: export GO111MODULE=on
-build_linux: export GOPROXY=https://gocenter.io
+build_linux: export GOPROXY=$(MOD_PROXY_URL)
 build_linux:
 	@GOOS=linux go build -v --ldflags="-w -X main.Version=$(VERSION) -X main.Revision=$(REVISION)" \
 		-o bin/linux/amd64/helmpush cmd/helmpush/main.go  # linux
@@ -30,7 +30,7 @@ link_linux:
 build_mac: export GOARCH=amd64
 build_mac: export CGO_ENABLED=0
 build_mac: export GO111MODULE=on
-build_mac: export GOPROXY=https://gocenter.io
+build_mac: export GOPROXY=$(MOD_PROXY_URL)
 build_mac:
 	@GOOS=darwin go build -v --ldflags="-w -X main.Version=$(VERSION) -X main.Revision=$(REVISION)" \
 		-o bin/darwin/amd64/helmpush cmd/helmpush/main.go # mac osx
