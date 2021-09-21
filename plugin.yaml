@@ -1,4 +1,4 @@
-name: "push"
+name: "legacy-push"
 version: "0.9.0"
 usage: "Please see https://github.com/chartmuseum/helm-push for usage"
 description: "Push chart package to ChartMuseum"
