@@ -39,14 +39,14 @@ Done.
 ```
 
 ### Pushing with a custom version
-The `--version` flag can be provided, which will push the package with a custom version.
+The `--version` flag can be provided, which will push the package with a custom version:
 
-Here is an example using the last git commit id as the version:
 ```
-$ helm cm-push mychart/ --version="$(git log -1 --pretty=format:%h)" chartmuseum
-Pushing mychart-5abbbf28.tgz to chartmuseum...
+$ helm cm-push mychart/ --version="1.2.3" chartmuseum
+Pushing mychart-1.2.3.tgz to chartmuseum...
 Done.
 ```
+
 If you want to enable something like `--version="9.9.9-dev1"`, which you intend to push regularly, you will need to run your ChartMuseum server with `ALLOW_OVERWRITE=true`.
 
 ### Push .tgz package
