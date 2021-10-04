@@ -3,7 +3,7 @@ name: build-pr
 on:
   pull_request:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -22,13 +22,13 @@ jobs:
       - name: run acceptance tests
         run: make acceptance
       - name: upload coverage report
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
           name: helmpush-coverage-report-${{ github.sha }}
           path: .cover/
         if: always()
       - name: upload acceptance report
-        uses: actions/upload-artifact@master
+        uses: actions/upload-artifact@main
         with:
           name: helmpush-acceptance-report-${{ github.sha }}
           path: .robot/

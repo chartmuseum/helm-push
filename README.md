@@ -47,7 +47,7 @@ $ helm push mychart/ --version="$(git log -1 --pretty=format:%h)" chartmuseum
 Pushing mychart-5abbbf28.tgz to chartmuseum...
 Done.
 ```
-If you want to enable something like `--version="latest"`, which you intend to push regularly, you will need to run your ChartMuseum server with `ALLOW_OVERWRITE=true`.
+If you want to enable something like `--version="9.9.9-dev1"`, which you intend to push regularly, you will need to run your ChartMuseum server with `ALLOW_OVERWRITE=true`.
 
 ### Push .tgz package
 This workflow does not require the use of `helm package`, but pushing .tgzs is still suppported:
