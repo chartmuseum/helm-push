@@ -50,6 +50,7 @@ type (
 		keyring            string
 		dependencyUpdate   bool
 		out                io.Writer
+		timeout            int64
 	}
 
 	config struct {
@@ -125,6 +126,7 @@ func newPushCmd(args []string) *cobra.Command {
 	f.BoolVarP(&p.forceUpload, "force", "f", false, "Force upload even if chart version exists")
 	f.BoolVarP(&p.dependencyUpdate, "dependency-update", "d", false, `update dependencies from "requirements.yaml" to dir "charts/" before packaging`)
 	f.BoolVarP(&p.checkHelmVersion, "check-helm-version", "", false, `outputs either "2" or "3" indicating the current Helm major version`)
+	f.Int64VarP(&p.timeout, "timeout", "t", 30, "The duration (in seconds) Helm will wait to get response from chartmuseum")
 
 	f.Parse(args)
 
@@ -303,6 +305,7 @@ func (p *pushCmd) push() error {
 		cm.CertFile(p.certFile),
 		cm.KeyFile(p.keyFile),
 		cm.InsecureSkipVerify(p.insecureSkipVerify),
+		cm.Timeout(p.timeout),
 	)
 
 	if err != nil {
