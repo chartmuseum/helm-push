@@ -31,6 +31,6 @@ else
     wget -q "${url}" -O "releases/v${version}.tar.gz"
 fi
 tar xzf "releases/v${version}.tar.gz" -C "releases/v${version}"
-mv "releases/v${version}/bin/helmpush" "bin/helmpush" || \
-    mv "releases/v${version}/bin/helmpush.exe" "bin/helmpush"
+mv "releases/v${version}/bin/helm-cm-push" "bin/helm-cm-push" || \
+    mv "releases/v${version}/bin/helm-cm-push.exe" "bin/helm-cm-push"
 
