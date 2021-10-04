@@ -56,18 +56,18 @@ Chart directory can be pushed to ChartMuseum
 
 Chart directory can be pushed to ChartMuseum with custom version
     # Repo name
-    push chart directory    latest
+    push chart directory    9.9.9-dev1
     HelmPush.return code should be   0
-    package exists in chartmuseum storage   latest
+    package exists in chartmuseum storage   9.9.9-dev1
     package contains expected files
     HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
     # Repo URL
-    push chart directory to url    latest
+    push chart directory to url    9.9.9-dev1
     HelmPush.return code should be   0
-    package exists in chartmuseum storage   latest
+    package exists in chartmuseum storage   9.9.9-dev1
     package contains expected files
     HelmPush.return code should be   0
     ChartMuseum.return code should be   0
@@ -94,18 +94,18 @@ Chart package can be pushed to ChartMuseum
 
 Chart package can be pushed to ChartMuseum with custom version
     # Repo name
-    push chart package  latest
+    push chart package  9.9.9-dev1
     HelmPush.return code should be   0
-    package exists in chartmuseum storage   latest
+    package exists in chartmuseum storage   9.9.9-dev1
     package contains expected files
     HelmPush.return code should be   0
     ChartMuseum.return code should be   0
     clear chartmuseum storage
 
     # Repo URL
-    push chart package to url  latest
+    push chart package to url  9.9.9-dev1
     HelmPush.return code should be   0
-    package exists in chartmuseum storage   latest
+    package exists in chartmuseum storage   9.9.9-dev1
     package contains expected files
     HelmPush.return code should be   0
     ChartMuseum.return code should be   0

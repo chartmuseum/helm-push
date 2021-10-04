@@ -1,6 +1,6 @@
 #!/bin/bash -ex
 
-PY_REQUIRES="robotframework==3.2.2"
+PY_REQUIRES="robotframework==4.1.1"
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 cd $DIR/../
@@ -23,7 +23,7 @@ export TEST_V3_XDG_DATA_HOME="$PWD/.helm3/xdg/data"
 
 if [ ! -d .venv/ ]; then
     virtualenv -p $(which python3) .venv/
-    .venv/bin/python .venv/bin/pip install $PY_REQUIRES
+    .venv/bin/python .venv/bin/pip3 install $PY_REQUIRES
 fi
 
 mkdir -p .robot/

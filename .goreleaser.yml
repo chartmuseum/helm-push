@@ -1,12 +1,11 @@
 env:
   - GO111MODULE=on
-  - GOPROXY=https://gocenter.io
 before:
   hooks:
     - go mod download
 builds:
-  - main: ./cmd/helmpush
-    binary: ./bin/helmpush
+  - main: ./cmd/helm-cm-push
+    binary: ./bin/helm-cm-push
     env:
       - CGO_ENABLED=0
     goos:
