@@ -395,7 +395,7 @@ func (p *pushCmd) download(fileURL string) error {
 }
 
 func handlePushResponse(resp *http.Response) error {
-	if resp.StatusCode != 201 {
+	if resp.StatusCode != 201 && resp.StatusCode != 202 {
 		b, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			return err
