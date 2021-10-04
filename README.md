@@ -1,4 +1,4 @@
-# helm push plugin
+# helm cm-push plugin
 <img align="right" src="https://github.com/helm/chartmuseum/raw/main/logo.png">
 
 [![GitHub Actions status](https://github.com/chartmuseum/helm-push/workflows/build/badge.svg)](https://github.com/chartmuseum/helm-push/actions?query=workflow%3Abuild)
@@ -12,7 +12,7 @@ Based on the version in `plugin.yaml`, release binary will be downloaded from Gi
 $ helm plugin install https://github.com/chartmuseum/helm-push.git
 Downloading and installing helm-push v0.9.0 ...
 https://github.com/chartmuseum/helm-push/releases/download/v0.9.0/helm-push_0.9.0_darwin_amd64.tar.gz
-Installed plugin: push
+Installed plugin: cm-push
 ```
 
 ## Usage
@@ -22,7 +22,7 @@ $ helm repo add chartmuseum http://localhost:8080
 ```
 For all available plugin options, please run
 ```
-$ helm push --help
+$ helm cm-push --help
 ```
 
 ### Pushing a directory
@@ -33,7 +33,7 @@ name: mychart
 version: 0.3.2
 ```
 ```
-$ helm push mychart/ chartmuseum
+$ helm cm-push mychart/ chartmuseum
 Pushing mychart-0.3.2.tgz to chartmuseum...
 Done.
 ```
@@ -43,7 +43,7 @@ The `--version` flag can be provided, which will push the package with a custom 
 
 Here is an example using the last git commit id as the version:
 ```
-$ helm push mychart/ --version="$(git log -1 --pretty=format:%h)" chartmuseum
+$ helm cm-push mychart/ --version="$(git log -1 --pretty=format:%h)" chartmuseum
 Pushing mychart-5abbbf28.tgz to chartmuseum...
 Done.
 ```
@@ -52,7 +52,7 @@ If you want to enable something like `--version="9.9.9-dev1"`, which you intend 
 ### Push .tgz package
 This workflow does not require the use of `helm package`, but pushing .tgzs is still suppported:
 ```
-$ helm push mychart-0.3.2.tgz chartmuseum
+$ helm cm-push mychart-0.3.2.tgz chartmuseum
 Pushing mychart-0.3.2.tgz to chartmuseum...
 Done.
 ```
@@ -62,7 +62,7 @@ If your ChartMuseum install is configured with `ALLOW_OVERWRITE=true`, chart ver
 
 Otherwise, unless your install is configured with `DISABLE_FORCE_OVERWRITE=true` (ChartMuseum > v0.7.1), you can use the `--force`/`-f` option to to force an upload:
 ```
-$ helm push --force mychart-0.3.2.tgz chartmuseum
+$ helm cm-push --force mychart-0.3.2.tgz chartmuseum
 Pushing mychart-0.3.2.tgz to chartmuseum...
 Done.
 ```
@@ -70,7 +70,7 @@ Done.
 ### Pushing directly to URL
 If the second argument provided resembles a URL, you are not required to add the repo prior to push:
 ```
-$ helm push mychart-0.3.2.tgz http://localhost:8080
+$ helm cm-push mychart-0.3.2.tgz http://localhost:8080
 Pushing mychart-0.3.2.tgz to http://localhost:8080...
 Done.
 ```
@@ -85,7 +85,7 @@ https://my.chart.repo.com/helm/v1/index.yaml -> http://chartmuseum-svc/index.yam
 You can use the `--context-path=` option or `HELM_REPO_CONTEXT_PATH` env var in order for the plugin to construct the upload URL correctly:
 ```
 helm repo add chartmuseum https://my.chart.repo.com/helm/v1
-helm push --context-path=/helm/v1 mychart-0.3.2.tgz chartmuseum
+helm cm-push --context-path=/helm/v1 mychart-0.3.2.tgz chartmuseum
 ```
 
 Alternatively, you can add `serverInfo.contextPath` to your index.yaml:
