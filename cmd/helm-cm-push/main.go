@@ -73,7 +73,7 @@ Examples:
 
   $ helm cm-push mychart-0.1.0.tgz chartmuseum       # push .tgz from "helm package"
   $ helm cm-push . chartmuseum                       # package and push chart directory
-  $ helm cm-push . --version="7c4d121" chartmuseum   # override version in Chart.yaml
+  $ helm cm-push . --version="1.2.3" chartmuseum     # override version in Chart.yaml
   $ helm cm-push . https://my.chart.repo.com         # push directly to chart repo URL
 `
 )
