@@ -50,7 +50,7 @@ Done.
 If you want to enable something like `--version="9.9.9-dev1"`, which you intend to push regularly, you will need to run your ChartMuseum server with `ALLOW_OVERWRITE=true`.
 
 ### Push .tgz package
-This workflow does not require the use of `helm package`, but pushing .tgzs is still suppported:
+This workflow does not require the use of `helm package`, but pushing .tgzs is still supported:
 ```
 $ helm cm-push mychart-0.3.2.tgz chartmuseum
 Pushing mychart-0.3.2.tgz to chartmuseum...
