@@ -115,7 +115,7 @@ With this setup, you can enable people to use your repo for installing charts et
 
 ### Token
 
-*ChartMuseum token-auth is currently in progress. Pleasee see [auth-server-example](https://github.com/chartmuseum/auth-server-example) for more info.*
+*ChartMuseum token-auth is currently in progress. Please see [auth-server-example](https://github.com/chartmuseum/auth-server-example) for more info.*
 
 Although ChartMuseum server does not define or accept a token format (yet), if you are running it behind a proxy that accepts access tokens, you can provide the following env var:
 ```
