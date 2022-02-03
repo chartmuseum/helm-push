@@ -11,12 +11,31 @@ version="$(cat plugin.yaml | grep "version" | cut -d '"' -f 2)"
 echo "Downloading and installing helm-push v${version} ..."
 
 url=""
+
+arch=""
+case $(uname -m) in
+  x86_64)
+    arch="amd64"
+    ;;
+  arm*)
+    arch="arm"
+    ;;
+  aarch64)
+    arch="arm64"
+    ;;
+  *)
+    echo "Failed to detect target architecture"
+    exit 1
+    ;;
+esac
+
+
 if [ "$(uname)" = "Darwin" ]; then
-    url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_darwin_amd64.tar.gz"
+    url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_darwin_${arch}.tar.gz"
 elif [ "$(uname)" = "Linux" ] ; then
-    url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_linux_amd64.tar.gz"
+    url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_linux_${arch}.tar.gz"
 else
-    url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_windows_amd64.tar.gz"
+    url="https://github.com/chartmuseum/helm-push/releases/download/v${version}/helm-push_${version}_windows_${arch}.tar.gz"
 fi
 
 echo $url
@@ -33,4 +52,3 @@ fi
 tar xzf "releases/v${version}.tar.gz" -C "releases/v${version}"
 mv "releases/v${version}/bin/helm-cm-push" "bin/helm-cm-push" || \
     mv "releases/v${version}/bin/helm-cm-push.exe" "bin/helm-cm-push"
-
