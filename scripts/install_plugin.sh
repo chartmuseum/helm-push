@@ -12,13 +12,20 @@ echo "Downloading and installing helm-push v${version} ..."
 
 url=""
 
+# convert architecture of the target system to a compatible GOARCH value.
+# Otherwise failes to download of the plugin from github, because the provided
+# architecture by `uname -m` is not part of the github release.
 arch=""
 case $(uname -m) in
   x86_64)
     arch="amd64"
     ;;
-  arm*)
-    arch="arm"
+  armv6*)
+    arch="armv6"
+    ;;
+  # match every arm processor version like armv7h, armv7l and so on.
+  armv7*)
+    arch="armv7"
     ;;
   aarch64)
     arch="arm64"
