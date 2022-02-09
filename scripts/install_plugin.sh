@@ -27,7 +27,7 @@ case $(uname -m) in
   armv7*)
     arch="armv7"
     ;;
-  aarch64)
+  aarch64 | arm64)
     arch="arm64"
     ;;
   *)
