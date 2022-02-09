@@ -14,3 +14,4 @@ releases/
 testbin/
 testdata/**/tmp
 vendor/
+.project
