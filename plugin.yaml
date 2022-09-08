@@ -1,5 +1,5 @@
 name: "cm-push"
-version: "0.10.3"
+version: "0.10.4"
 usage: "Please see https://github.com/chartmuseum/helm-push for usage"
 description: "Push chart package to ChartMuseum"
 command: "$HELM_PLUGIN_DIR/bin/helm-cm-push"
