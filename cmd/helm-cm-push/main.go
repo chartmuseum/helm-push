@@ -5,7 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
@@ -102,7 +101,7 @@ func newPushCmd(args []string) *cobra.Command {
 			}
 
 			if len(args) != 2 {
-				return errors.New("This command needs 2 arguments: name of chart, name of chart repository (or repo URL)")
+				return errors.New("this command needs 2 arguments: name of chart, name of chart repository (or repo URL)")
 			}
 			p.chartName = args[0]
 			p.repoName = args[1]
@@ -128,7 +127,10 @@ func newPushCmd(args []string) *cobra.Command {
 	f.BoolVarP(&p.checkHelmVersion, "check-helm-version", "", false, `outputs either "2" or "3" indicating the current Helm major version`)
 	f.Int64VarP(&p.timeout, "timeout", "t", 30, "The duration (in seconds) Helm will wait to get response from chartmuseum")
 
-	f.Parse(args)
+	err := f.Parse(args)
+	if err != nil {
+		return nil
+	}
 
 	v2settings.AddFlags(f)
 	v2settings.Init(f)
@@ -183,7 +185,7 @@ func (p *pushCmd) setAccessTokenFromConfigFile() {
 		return
 	}
 	var c config
-	yamlFile, err := ioutil.ReadFile(configPath)
+	yamlFile, err := os.ReadFile(configPath)
 	if err != nil {
 		return
 	}
@@ -312,7 +314,7 @@ func (p *pushCmd) push() error {
 		return err
 	}
 
-	// update context path if not overrided
+	// update context path if not override
 	if p.contextPath == "" {
 		index, err := helm.GetIndexByRepo(repo, getIndexDownloader(client))
 		if err != nil {
@@ -321,11 +323,16 @@ func (p *pushCmd) push() error {
 		client.Option(cm.ContextPath(index.ServerInfo.ContextPath))
 	}
 
-	tmp, err := ioutil.TempDir("", "helm-push-")
+	tmp, err := os.MkdirTemp("", "helm-push-")
 	if err != nil {
 		return err
 	}
-	defer os.RemoveAll(tmp)
+	defer func(path string) {
+		err := os.RemoveAll(path)
+		if err != nil {
+			fmt.Printf("Failed to remove temporary directory %s: %s", path, err)
+		}
+	}(tmp)
 
 	chartPackagePath, err := helm.CreateChartPackage(chart, tmp)
 	if err != nil {
@@ -396,7 +403,7 @@ func (p *pushCmd) download(fileURL string) error {
 
 func handlePushResponse(resp *http.Response) error {
 	if resp.StatusCode != 201 && resp.StatusCode != 202 {
-		b, err := ioutil.ReadAll(resp.Body)
+		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return err
 		}
@@ -407,7 +414,7 @@ func handlePushResponse(resp *http.Response) error {
 }
 
 func handleDownloadResponse(resp *http.Response) error {
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	defer resp.Body.Close()
 	if err != nil {
 		return err
@@ -437,7 +444,7 @@ func getIndexDownloader(client *cm.Client) helm.IndexDownloader {
 			return nil, err
 		}
 		defer resp.Body.Close()
-		b, err := ioutil.ReadAll(resp.Body)
+		b, err := io.ReadAll(resp.Body)
 		if err != nil {
 			return nil, err
 		}
