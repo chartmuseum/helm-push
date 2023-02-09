@@ -34,7 +34,7 @@ class Helm(common.CommandRunner):
         self.run_command('%s plugin list | grep ^cm-push' % common.HELM_EXE)
 
     def run_helm_plugin(self):
-        self.run_command('%s cm-push --help' % common.HELM_EXE)
+        self.run_command('%s cm-push --check-helm-version' % common.HELM_EXE)
 
     def remove_helm_plugin(self):
         self.run_command('%s plugin remove cm-push' % common.HELM_EXE)
