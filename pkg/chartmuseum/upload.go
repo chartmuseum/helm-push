@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"mime/multipart"
 	"net/http"
 	"net/url"
@@ -68,6 +67,6 @@ func setUploadChartPackageRequestBody(req *http.Request, chartPackagePath string
 		return err
 	}
 	req.Header.Set("Content-Type", w.FormDataContentType())
-	req.Body = ioutil.NopCloser(&body)
+	req.Body = io.NopCloser(&body)
 	return nil
 }

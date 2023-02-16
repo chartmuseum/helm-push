@@ -2,7 +2,7 @@ package helm
 
 import (
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 
 	"github.com/ghodss/yaml"
@@ -24,7 +24,7 @@ type (
 func GetIndexByRepo(repo *Repo, downloadIndex IndexDownloader) (*Index, error) {
 	if repo.Config.Name != "" {
 		return GetIndexByDownloader(func() ([]byte, error) {
-			return ioutil.ReadFile(filepath.Join(repo.CachePath, fmt.Sprintf("%s-index.yaml", repo.Config.Name)))
+			return os.ReadFile(filepath.Join(repo.CachePath, fmt.Sprintf("%s-index.yaml", repo.Config.Name)))
 		})
 	}
 	return GetIndexByDownloader(downloadIndex)

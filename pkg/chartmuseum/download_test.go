@@ -3,7 +3,7 @@ package chartmuseum
 import (
 	"crypto/tls"
 	"encoding/base64"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -16,8 +16,13 @@ func TestDownloadFile(t *testing.T) {
 			w.WriteHeader(401)
 		} else {
 			w.WriteHeader(200)
-			w.Write([]byte("hello world"))
+			_, err := w.Write([]byte("hello world"))
+			if err != nil {
+				return
+			}
+
 		}
+
 	}))
 	defer ts.Close()
 
@@ -34,7 +39,7 @@ func TestDownloadFile(t *testing.T) {
 	if err != nil {
 		t.Fatal("error downloading testfile", err)
 	}
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatal("error reading response body", err)
 	}
@@ -60,7 +65,10 @@ func TestDownloadFileFromTlsServer(t *testing.T) {
 			w.WriteHeader(401)
 		} else {
 			w.WriteHeader(200)
-			w.Write([]byte("hello world"))
+			_, err := w.Write([]byte("hello world"))
+			if err != nil {
+				return
+			}
 		}
 	}))
 	cert, err := tls.LoadX509KeyPair(testServerCertPath, testServerKeyPath)
@@ -103,7 +111,7 @@ func TestDownloadFileFromTlsServer(t *testing.T) {
 	if err != nil {
 		t.Fatalf("[with ca file] error downloading testfile: %s", err)
 	}
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
 		t.Fatalf("[with ca file] error reading response body: %s", err)
 	}
