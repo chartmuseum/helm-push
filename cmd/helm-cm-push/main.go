@@ -127,8 +127,16 @@ func newPushCmd(args []string) *cobra.Command {
 	f.BoolVarP(&p.checkHelmVersion, "check-helm-version", "", false, `outputs either "2" or "3" indicating the current Helm major version`)
 	f.Int64VarP(&p.timeout, "timeout", "t", 30, "The duration (in seconds) Helm will wait to get response from chartmuseum")
 
+	// disable help
+	for _, arg := range args {
+		if arg == "--help" || arg == "-h" {
+			args = nil
+		}
+	}
+
 	err := f.Parse(args)
 	if err != nil {
+		fmt.Fprintln(os.Stderr, err)
 		return nil
 	}
 
@@ -457,8 +465,11 @@ func getIndexDownloader(client *cm.Client) helm.IndexDownloader {
 
 func main() {
 	cmd := newPushCmd(os.Args[1:])
-	if err := cmd.Execute(); err != nil {
-		os.Exit(1)
+	if cmd != nil {
+		if err := cmd.Execute(); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
 	}
 }
 
