@@ -1,6 +1,6 @@
 module github.com/chartmuseum/helm-push
 
-go 1.18
+go 1.20
 
 require (
 	github.com/ghodss/yaml v1.0.0
