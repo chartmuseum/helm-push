@@ -85,7 +85,6 @@ func newPushCmd(args []string) *cobra.Command {
 		Long:         globalUsage,
 		SilenceUsage: false,
 		RunE: func(cmd *cobra.Command, args []string) error {
-
 			// If the --check-helm-version flag is provided, short circuit
 			if p.checkHelmVersion {
 				fmt.Println(helm.HelmMajorVersionCurrent())
@@ -126,10 +125,13 @@ func newPushCmd(args []string) *cobra.Command {
 	f.BoolVarP(&p.dependencyUpdate, "dependency-update", "d", false, `update dependencies from "requirements.yaml" to dir "charts/" before packaging`)
 	f.BoolVarP(&p.checkHelmVersion, "check-helm-version", "", false, `outputs either "2" or "3" indicating the current Helm major version`)
 	f.Int64VarP(&p.timeout, "timeout", "t", 30, "The duration (in seconds) Helm will wait to get response from chartmuseum")
-
+	// fallback to cobra's built-in help , we don't need to handle this flag
+	f.BoolP("help", "h", false, "")
 	err := f.Parse(args)
 	if err != nil {
-		return nil
+		fmt.Fprintf(os.Stderr, "cannot parse flags: %s\n", err)
+		// still return other flags , do not panic the following code
+		return cmd
 	}
 
 	v2settings.AddFlags(f)
@@ -309,7 +311,6 @@ func (p *pushCmd) push() error {
 		cm.InsecureSkipVerify(p.insecureSkipVerify),
 		cm.Timeout(p.timeout),
 	)
-
 	if err != nil {
 		return err
 	}
@@ -388,7 +389,6 @@ func (p *pushCmd) download(fileURL string) error {
 		cm.KeyFile(p.keyFile),
 		cm.InsecureSkipVerify(p.insecureSkipVerify),
 	)
-
 	if err != nil {
 		return err
 	}
