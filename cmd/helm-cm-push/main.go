@@ -247,11 +247,13 @@ func (p *pushCmd) push() error {
 				}
 			} else {
 				downloadManager := &downloader.Manager{
-					Out:       p.out,
-					ChartPath: chartPath,
-					Keyring:   p.keyring,
-					Getters:   getter.All(settings),
-					Debug:     v2settings.Debug,
+					Out:              p.out,
+					ChartPath:        chartPath,
+					Keyring:          p.keyring,
+					Getters:          getter.All(settings),
+					Debug:            settings.Debug,
+					RepositoryConfig: settings.RepositoryConfig,
+					RepositoryCache:  settings.RepositoryCache,
 				}
 				if err := downloadManager.Update(); err != nil {
 					return err
