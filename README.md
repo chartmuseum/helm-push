@@ -1,7 +1,7 @@
 # helm cm-push plugin
 <img align="right" src="https://github.com/helm/chartmuseum/raw/main/logo.png">
 
-[![GitHub Actions status](https://github.com/chartmuseum/helm-push/workflows/build/badge.svg)](https://github.com/chartmuseum/helm-push/actions?query=workflow%3Abuild)
+[![GitHub Actions status](https://github.com/FLimburg/helm-push/workflows/build/badge.svg)](https://github.com/FLimburg/helm-push/actions?query=workflow%3Abuild)
 
 Helm plugin to push chart package to [ChartMuseum](https://github.com/helm/chartmuseum)
 
@@ -9,9 +9,9 @@ Helm plugin to push chart package to [ChartMuseum](https://github.com/helm/chart
 Based on the version in `plugin.yaml`, release binary will be downloaded from GitHub:
 
 ```
-$ helm plugin install https://github.com/chartmuseum/helm-push
+$ helm plugin install https://github.com/FLimburg/helm-push
 Downloading and installing helm-push v0.10.1 ...
-https://github.com/chartmuseum/helm-push/releases/download/v0.10.1/helm-push_0.10.1_darwin_amd64.tar.gz
+https://github.com/FLimburg/helm-push/releases/download/v0.10.1/helm-push_0.10.1_darwin_amd64.tar.gz
 Installed plugin: cm-push
 ```
 
