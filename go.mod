@@ -1,4 +1,4 @@
-module github.com/ActianCorp/helm-push
+module github.com/chartmuseum/helm-push
 
 go 1.21
 
