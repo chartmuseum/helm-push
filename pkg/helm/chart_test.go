@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-var testTarballPath = "../../testdata/charts/helm2/mychart/mychart-0.1.0.tgz"
+var testTarballPath = "../../testdata/charts/helm3/my-v3-chart"
 
 func TestSetVersion(t *testing.T) {
 	c, err := GetChartByName(testTarballPath)
@@ -32,8 +32,8 @@ func TestGetChartByName(t *testing.T) {
 	if err != nil {
 		t.Error("unexpected error getting test tarball chart", err)
 	}
-	if c.Metadata.Name != "mychart" {
-		t.Errorf("expexted chart name to be mychart, instead got %s", c.Metadata.Name)
+	if c.Metadata.Name != "my-v3-chart" {
+		t.Errorf("expexted chart name to be my-v3-chart, instead got %s", c.Metadata.Name)
 	}
 	if c.Metadata.Version != "0.1.0" {
 		t.Errorf("expexted chart version to be 0.1.0, instead got %s", c.Metadata.Version)
@@ -57,7 +57,7 @@ func TestCreateChartPackage(t *testing.T) {
 		t.Error("unexpected error creating chart package", err)
 	}
 
-	expectedPath := path.Join(tmp, "mychart-0.1.0.tgz")
+	expectedPath := path.Join(tmp, "my-v3-chart-0.1.0.tgz")
 	if chartPackagePath != expectedPath {
 		t.Errorf("expected chart path to be %s, but was %s", expectedPath, chartPackagePath)
 	}

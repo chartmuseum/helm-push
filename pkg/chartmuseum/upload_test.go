@@ -3,17 +3,17 @@ package chartmuseum
 import (
 	"crypto/rand"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/base64"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"strings"
 	"testing"
-
-	"k8s.io/helm/pkg/tlsutil"
 )
 
 var (
-	testTarballPath    = "../../testdata/charts/helm2/mychart/mychart-0.1.0.tgz"
+	testTarballPath    = "../../testdata/charts/helm3/my-v3-chart-0.1.0.tgz"
 	testServerCertPath = "../../testdata/tls/server.crt"
 	testServerKeyPath  = "../../testdata/tls/server.key"
 	testServerCAPath   = "../../testdata/tls/server_ca.crt"
@@ -21,6 +21,19 @@ var (
 	testClientCertPath = "../../testdata/tls/client.crt"
 	testClientKeyPath  = "../../testdata/tls/client.key"
 )
+
+// certPoolFromFile loads a CA cert file and returns a cert pool
+func certPoolFromFile(filename string) (*x509.CertPool, error) {
+	caCert, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	if !caCertPool.AppendCertsFromPEM(caCert) {
+		return nil, err
+	}
+	return caCertPool, nil
+}
 
 func TestUploadChartPackage(t *testing.T) {
 	chartUploaded := false
@@ -245,7 +258,7 @@ func TestUploadChartPackageWithVerifyingClientCert(t *testing.T) {
 		t.Fatalf("failed to load certificate and key with error: %s", err.Error())
 	}
 
-	clientCaCertPool, err := tlsutil.CertPoolFromFile(testClientCAPath)
+	clientCaCertPool, err := certPoolFromFile(testClientCAPath)
 	if err != nil {
 		t.Fatalf("load server CA file failed with error: %s", err.Error())
 	}

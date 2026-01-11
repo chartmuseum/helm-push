@@ -1,0 +1,20 @@
+name: "cm-push"
+version: "0.11.0"
+apiVersion: v1
+type: cli/v1
+runtime: subprocess
+config:
+  usage: cm-push
+  shortHelp: Push chart package to ChartMuseum
+  longHelp: Helm plugin to push chart package to ChartMuseum
+runtimeConfig:
+  platformCommand:
+    - command: ${HELM_PLUGIN_DIR}/bin/helm-cm-push
+downloaders:
+  - command: "bin/helm-cm-push"
+    protocols:
+      - "cm"
+useTunnel: false
+hooks:
+  install: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"
+  update: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"

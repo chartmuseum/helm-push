@@ -3,8 +3,8 @@
 **/*.tgz.prov
 .chartmuseum.log
 .cover/
-.helm2/
 .helm3/
+.helm-version
 .idea/
 .robot/
 .venv/

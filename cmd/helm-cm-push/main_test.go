@@ -3,6 +3,7 @@ package main
 import (
 	"crypto/rand"
 	"crypto/tls"
+	"crypto/x509"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -10,14 +11,13 @@ import (
 	"strings"
 	"testing"
 
-	"k8s.io/helm/pkg/getter"
-	"k8s.io/helm/pkg/helm/helmpath"
-	"k8s.io/helm/pkg/repo"
-	"k8s.io/helm/pkg/tlsutil"
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/repo"
 )
 
 var (
-	testTarballPath    = "../../testdata/charts/helm2/mychart/mychart-0.1.0.tgz"
+	testTarballPath    = "../../testdata/charts/helm3/my-v3-chart"
 	testServerCertPath = "../../testdata/tls/server.crt"
 	testServerKeyPath  = "../../testdata/tls/server.key"
 	testServerCAPath   = "../../testdata/tls/server_ca.crt"
@@ -25,6 +25,19 @@ var (
 	testClientCertPath = "../../testdata/tls/client.crt"
 	testClientKeyPath  = "../../testdata/tls/client.key"
 )
+
+// certPoolFromFile loads a CA cert file and returns a cert pool
+func certPoolFromFile(filename string) (*x509.CertPool, error) {
+	caCert, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+	caCertPool := x509.NewCertPool()
+	if !caCertPool.AppendCertsFromPEM(caCert) {
+		return nil, err
+	}
+	return caCertPool, nil
+}
 
 func TestPushCmd(t *testing.T) {
 	statusCode := 201
@@ -42,23 +55,27 @@ func TestPushCmd(t *testing.T) {
 	}
 	defer os.RemoveAll(tmp)
 
-	home := helmpath.Home(tmp)
-	f := repo.NewRepoFile()
+	settings := cli.New()
+	repoFile := tmp + "/repositories.yaml"
+	settings.RepositoryConfig = repoFile
+	settings.RepositoryCache = tmp + "/repository"
 
-	entry := repo.Entry{}
+	f := repo.NewFile()
+
+	entry := &repo.Entry{}
 	entry.Name = "helm-push-test"
 	entry.URL = ts.URL
 
-	_, err = repo.NewChartRepository(&entry, getter.All(v2settings))
+	_, err = repo.NewChartRepository(entry, getter.All(settings))
 	if err != nil {
 		t.Error("unexpected error created test repository", err)
 	}
 
-	f.Update(&entry)
-	os.MkdirAll(home.Repository(), 0777)
-	f.WriteFile(home.RepositoryFile(), 0644)
+	f.Update(entry)
+	os.MkdirAll(tmp, 0777)
+	f.WriteFile(repoFile, 0644)
 
-	os.Setenv("HELM_HOME", home.String())
+	os.Setenv("HELM_REPOSITORY_CONFIG", repoFile)
 	os.Setenv("HELM_REPO_USERNAME", "myuser")
 	os.Setenv("HELM_REPO_PASSWORD", "mypass")
 	os.Setenv("HELM_REPO_CONTEXT_PATH", "/x/y/z")
@@ -165,7 +182,7 @@ func TestPushCmdWithTlsEnabledServer(t *testing.T) {
 		t.Fatalf("failed to load certificate and key with error: %s", err.Error())
 	}
 
-	clientCaCertPool, err := tlsutil.CertPoolFromFile(testClientCAPath)
+	clientCaCertPool, err := certPoolFromFile(testClientCAPath)
 	if err != nil {
 		t.Fatalf("load server CA file failed with error: %s", err.Error())
 	}
@@ -186,23 +203,27 @@ func TestPushCmdWithTlsEnabledServer(t *testing.T) {
 	}
 	defer os.RemoveAll(tmp)
 
-	home := helmpath.Home(tmp)
-	f := repo.NewRepoFile()
+	settings := cli.New()
+	repoFile := tmp + "/repositories.yaml"
+	settings.RepositoryConfig = repoFile
+	settings.RepositoryCache = tmp + "/repository"
 
-	entry := repo.Entry{}
+	f := repo.NewFile()
+
+	entry := &repo.Entry{}
 	entry.Name = "helm-push-test"
 	entry.URL = ts.URL
 
-	_, err = repo.NewChartRepository(&entry, getter.All(v2settings))
+	_, err = repo.NewChartRepository(entry, getter.All(settings))
 	if err != nil {
 		t.Error("unexpected error created test repository", err)
 	}
 
-	f.Update(&entry)
-	os.MkdirAll(home.Repository(), 0777)
-	f.WriteFile(home.RepositoryFile(), 0644)
+	f.Update(entry)
+	os.MkdirAll(tmp, 0777)
+	f.WriteFile(repoFile, 0644)
 
-	os.Setenv("HELM_HOME", home.String())
+	os.Setenv("HELM_REPOSITORY_CONFIG", repoFile)
 	os.Setenv("HELM_REPO_USERNAME", "myuser")
 	os.Setenv("HELM_REPO_PASSWORD", "mypass")
 	os.Setenv("HELM_REPO_CONTEXT_PATH", "/x/y/z")

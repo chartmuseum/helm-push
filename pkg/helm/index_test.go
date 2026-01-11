@@ -5,8 +5,10 @@ import (
 )
 
 func TestLoadIndex(t *testing.T) {
+	version := HelmMajorVersionCurrent()
+
 	// No context path
-	index, err := LoadIndex([]byte("apiVersion: v1\nentries: {}\ngenerated: \"2018-08-08T08:21:33Z\"\n"))
+	index, err := LoadIndex([]byte("apiVersion: v1\nentries: {}\ngenerated: \"2018-08-08T08:21:33Z\"\n"), version)
 	if err != nil {
 		t.Error("unexpected error loading index", err)
 	}
@@ -15,7 +17,7 @@ func TestLoadIndex(t *testing.T) {
 	}
 
 	// Has context path
-	index, err = LoadIndex([]byte("apiVersion: v1\nserverInfo:\n  contextPath: /helm/v1\nentries: {}\ngenerated: \"2018-08-08T08:21:33Z\"\n"))
+	index, err = LoadIndex([]byte("apiVersion: v1\nserverInfo:\n  contextPath: /helm/v1\nentries: {}\ngenerated: \"2018-08-08T08:21:33Z\"\n"), version)
 	if err != nil {
 		t.Error("unexpected error loading index", err)
 	}

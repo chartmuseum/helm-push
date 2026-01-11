@@ -6,11 +6,11 @@ Suite Setup       Suite Setup
 Suite Teardown    Suite Teardown
 
 *** Test Cases ***
-Plugin installs on Helm 2
-    Test plugin installation   2
-
 Plugin installs on Helm 3
     Test plugin installation   3
+
+Plugin installs on Helm 4
+    Test plugin installation   4
 
 *** Keywords ***
 Test plugin installation
@@ -45,11 +45,11 @@ helm-push is not listed as a Helm plugin after removal
 Suite Setup
     set helm version    3
     remove helm plugin
-    set helm version    2
+    set helm version    4
     remove helm plugin
 
 Suite Teardown
     set helm version    3
     remove helm plugin
-    set helm version    2
+    set helm version    4
     remove helm plugin

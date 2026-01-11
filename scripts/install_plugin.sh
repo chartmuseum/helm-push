@@ -2,6 +2,32 @@
 
 # Copied w/ love from the excellent hypnoglow/helm-s3
 
+# Detect Helm version and use appropriate plugin manifest
+update_plugin_manifest() {
+    # Check for explicit version override (useful in test environments)
+    if [ -n "$HELM_MAJOR_VERSION" ]; then
+        helm_version="$HELM_MAJOR_VERSION"
+    else
+        # Detect from helm binary
+        helm_version=$(helm version --short 2>/dev/null | sed -n 's/v\([0-9]*\).*/\1/p' | head -1)
+    fi
+
+    plugin_dir="${HELM_PLUGIN_DIR:-$(pwd)}"
+
+    # Copy the appropriate manifest for this Helm version
+    if [ "$helm_version" = "4" ] && [ -f "$plugin_dir/testdata/plugin-helm4.yaml" ]; then
+        cp "$plugin_dir/testdata/plugin-helm4.yaml" "$plugin_dir/plugin.yaml"
+    elif [ -f "$plugin_dir/testdata/plugin-helm3.yaml" ]; then
+        cp "$plugin_dir/testdata/plugin-helm3.yaml" "$plugin_dir/plugin.yaml"
+    fi
+}
+
+# Only update manifest if not in development mode
+# In development mode, tests will manage plugin.yaml directly
+if [ -z "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
+    update_plugin_manifest
+fi
+
 if [ -n "${HELM_PUSH_PLUGIN_NO_INSTALL_HOOK}" ]; then
     echo "Development mode: not downloading versioned release."
     exit 0
@@ -59,3 +85,6 @@ fi
 tar xzf "releases/v${version}.tar.gz" -C "releases/v${version}"
 mv "releases/v${version}/bin/helm-cm-push" "bin/helm-cm-push" || \
     mv "releases/v${version}/bin/helm-cm-push.exe" "bin/helm-cm-push"
+
+# Update manifest for the detected Helm version
+update_plugin_manifest
