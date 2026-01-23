@@ -110,7 +110,7 @@ Suite Setup
     remove helm plugin
     remove chartmuseum logs
     start chartmuseum
-    Sleep  2
+    Sleep  5
     set helm version    3
     add chart repo
     set helm version    4
