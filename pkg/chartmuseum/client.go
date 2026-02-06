@@ -47,7 +47,7 @@ func NewClient(opts ...Option) (*Client, error) {
 	return &client, nil
 }
 
-//Create transport with TLS config
+// Create transport with TLS config
 func newTransport(certFile, keyFile, caFile string, insecureSkipVerify bool) (*http.Transport, error) {
 	transport := &http.Transport{}
 
@@ -82,7 +82,7 @@ func newClientTLS(certFile, keyFile, caFile string) (*tls.Config, error) {
 		}
 		caCertPool := x509.NewCertPool()
 		if !caCertPool.AppendCertsFromPEM(caCert) {
-			return nil, fmt.Errorf("failed to append CA cert from %s", caFile)
+			return nil, fmt.Errorf("failed to append CA certs from PEM file: %s", caFile)
 		}
 		config.RootCAs = caCertPool
 	}

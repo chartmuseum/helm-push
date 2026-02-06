@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -30,7 +31,7 @@ func certPoolFromFile(filename string) (*x509.CertPool, error) {
 	}
 	caCertPool := x509.NewCertPool()
 	if !caCertPool.AppendCertsFromPEM(caCert) {
-		return nil, err
+		return nil, fmt.Errorf("failed to append CA certs from PEM file: %s", filename)
 	}
 	return caCertPool, nil
 }

@@ -13,7 +13,7 @@ func TestLoadIndex(t *testing.T) {
 		t.Error("unexpected error loading index", err)
 	}
 	if index.ServerInfo.ContextPath != "" {
-		t.Errorf("expexted empty context path, instead got %s", index.ServerInfo.ContextPath)
+		t.Errorf("expected empty context path, instead got %s", index.ServerInfo.ContextPath)
 	}
 
 	// Has context path
@@ -22,6 +22,6 @@ func TestLoadIndex(t *testing.T) {
 		t.Error("unexpected error loading index", err)
 	}
 	if index.ServerInfo.ContextPath != "/helm/v1" {
-		t.Errorf("expexted context path to be /helm/v1, instead got %s", index.ServerInfo.ContextPath)
+		t.Errorf("expected context path to be /helm/v1, instead got %s", index.ServerInfo.ContextPath)
 	}
 }
