@@ -6,7 +6,7 @@ require (
 	github.com/ghodss/yaml v1.0.0
 	github.com/spf13/cobra v1.10.2
 	go.yaml.in/yaml/v3 v3.0.4
-	helm.sh/helm/v3 v3.18.5
+	helm.sh/helm/v3 v3.20.0
 	helm.sh/helm/v4 v4.1.0
 	sigs.k8s.io/yaml v1.6.0
 )
