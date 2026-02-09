@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.11.1
+
+### Fixes
+- **Fix plugin manifest compatibility for Helm v3 and v4** — ship `plugin.yaml` in Helm 3 (legacy) format so both versions can parse it; the install hook swaps to the Helm 4 manifest when needed (#234, #235, #237)
+
+### Tests
+- Add plugin manifest compatibility tests that validate YAML against both Helm v3 and v4 parsing logic, preventing future regressions
+
 ## v0.11.0
 
 ### Breaking Changes
