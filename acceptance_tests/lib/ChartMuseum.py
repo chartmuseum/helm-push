@@ -30,10 +30,10 @@ class ChartMuseum(common.CommandRunner):
         self.run_command('find %s -maxdepth 1 -name "*%s.tgz" | grep tgz' % (common.STORAGE_DIR, find))
 
     def package_contains_expected_files(self):
-        # Check for requirements.yaml in Helm 2 (a Helm 2-specific file)
+        # Check for requirements.yaml (legacy dependency format)
         checkRequirementsYamlCmd = '(cd %s && mkdir -p tmp && tar -xf *.tgz --directory tmp && find tmp -name requirements.yaml | grep requirements.yaml)' % common.STORAGE_DIR
 
-        # Check for values.schema.json in Helm 3 (a Helm 3-specific file)
+        # Check for values.schema.json (Helm 3+ specific file)
         checkValuesSchemaJsonCmd = '(cd %s && mkdir -p tmp && tar -xf *.tgz --directory tmp && find tmp -name values.schema.json | grep values.schema.json)' % common.STORAGE_DIR
 
         if common.USE_OPPOSITE_VERSION:

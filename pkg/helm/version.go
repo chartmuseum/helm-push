@@ -2,7 +2,8 @@ package helm
 
 import (
 	"os"
-	"os/exec"
+	"path/filepath"
+	"strings"
 )
 
 type (
@@ -10,8 +11,8 @@ type (
 )
 
 const (
-	HelmMajorVersion2 = 2
 	HelmMajorVersion3 = 3
+	HelmMajorVersion4 = 4
 )
 
 var (
@@ -22,16 +23,21 @@ func HelmMajorVersionCurrent() HelmMajorVersion {
 	if helmMajorVersionCurrent != 0 {
 		return helmMajorVersionCurrent
 	}
-	helmBin, helmBinVarSet := os.LookupEnv("HELM_BIN")
-	if !helmBinVarSet {
-		helmBin = "helm"
+
+	// Detect version by checking which plugin manifest format is being used
+	// Helm 4 manifests contain "apiVersion", Helm 3 manifests don't
+	if pluginDir := os.Getenv("HELM_PLUGIN_DIR"); pluginDir != "" {
+		manifestFile := filepath.Join(pluginDir, "plugin.yaml")
+		if data, err := os.ReadFile(manifestFile); err == nil {
+			// Check if manifest contains "apiVersion" field (Helm 4 format)
+			if strings.Contains(string(data), "apiVersion:") {
+				helmMajorVersionCurrent = HelmMajorVersion4
+				return helmMajorVersionCurrent
+			}
+		}
 	}
-	helmVersion2CheckCmd := exec.Command(helmBin, "version", "-c", "--tls")
-	err := helmVersion2CheckCmd.Run()
-	if e, ok := err.(*exec.ExitError); ok && !e.Success() {
-		helmMajorVersionCurrent = HelmMajorVersion3
-	} else {
-		helmMajorVersionCurrent = HelmMajorVersion2
-	}
+
+	// Default to v3 if we can't determine from manifest
+	helmMajorVersionCurrent = HelmMajorVersion3
 	return helmMajorVersionCurrent
 }

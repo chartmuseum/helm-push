@@ -1,11 +1,15 @@
+version: 2
+
 env:
   - GO111MODULE=on
+
 before:
   hooks:
     - go mod download
+
 builds:
   - main: ./cmd/helm-cm-push
-    binary: ./bin/helm-cm-push
+    binary: bin/helm-cm-push
     env:
       - CGO_ENABLED=0
     goos:
@@ -14,15 +18,21 @@ builds:
       - windows
     goarch:
       - amd64
-      - arm
       - arm64
-    goarm:
-      - "6"
-      - "7"
+    goamd64:
+      - v1
+    goarm64:
+      - v8.0
+    # Exclude windows arm builds (marked as broken by GoReleaser)
+    ignore:
+      - goos: windows
+        goarch: arm
 
 archives:
-  - id: tarball
-    format: tar.gz
+  - id: default
+    name_template: "{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}"
     files:
       - LICENSE
       - plugin.yaml
+      - testdata/plugin-helm3.yaml
+      - testdata/plugin-helm4.yaml

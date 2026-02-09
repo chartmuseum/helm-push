@@ -10,7 +10,9 @@ TESTCHARTS_DIR = 'testdata/charts'
 ACCEPTANCE_DIR = '.acceptance/'
 STORAGE_DIR = os.path.join(ACCEPTANCE_DIR, 'storage/')
 LOGFILE = '.chartmuseum.log'
-HELM_EXE = 'HELM_HOME=%s helm2' % os.getenv('TEST_HELM_HOME', '')
+HELM_EXE = 'XDG_CACHE_HOME=%s XDG_CONFIG_HOME=%s XDG_DATA_HOME=%s helm3' % \
+    (os.getenv('TEST_V3_XDG_CACHE_HOME', ''), os.getenv('TEST_V3_XDG_CONFIG_HOME', ''),
+     os.getenv('TEST_V3_XDG_DATA_HOME', ''))
 USE_OPPOSITE_VERSION = False
 
 

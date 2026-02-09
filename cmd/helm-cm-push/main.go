@@ -19,13 +19,15 @@ import (
 	"github.com/chartmuseum/helm-push/pkg/helm"
 	"github.com/ghodss/yaml"
 	"github.com/spf13/cobra"
-	"helm.sh/helm/v3/pkg/chartutil"
-	"helm.sh/helm/v3/pkg/cli"
-	"helm.sh/helm/v3/pkg/downloader"
-	"helm.sh/helm/v3/pkg/getter"
-	v2downloader "k8s.io/helm/pkg/downloader"
-	v2getter "k8s.io/helm/pkg/getter"
-	v2environment "k8s.io/helm/pkg/helm/environment"
+	v3chartutil "helm.sh/helm/v3/pkg/chartutil"
+	v3cli "helm.sh/helm/v3/pkg/cli"
+	v3downloader "helm.sh/helm/v3/pkg/downloader"
+	v3getter "helm.sh/helm/v3/pkg/getter"
+
+	v4chartutil "helm.sh/helm/v4/pkg/chart/v2/util"
+	v4cli "helm.sh/helm/v4/pkg/cli"
+	v4downloader "helm.sh/helm/v4/pkg/downloader"
+	v4getter "helm.sh/helm/v4/pkg/getter"
 )
 
 type (
@@ -64,8 +66,8 @@ type (
 )
 
 var (
-	v2settings  v2environment.EnvSettings
-	settings    = cli.New()
+	v3settings  = v3cli.New()
+	v4settings  = v4cli.New()
 	globalUsage = `Helm plugin to push chart package to ChartMuseum
 
 Examples:
@@ -133,9 +135,6 @@ func newPushCmd(args []string) *cobra.Command {
 		// still return other flags , do not panic the following code
 		return cmd
 	}
-
-	v2settings.AddFlags(f)
-	v2settings.Init(f)
 
 	return cmd
 }
@@ -210,7 +209,7 @@ func (p *pushCmd) push() error {
 	// instead of looking for the entry in the local repository list
 	if regexp.MustCompile(`^https?://`).MatchString(p.repoName) {
 		repo, err = helm.TempRepoFromURL(p.repoName)
-		p.repoName = repo.Config.URL
+		p.repoName = repo.GetConfigURL()
 	} else {
 		repo, err = helm.GetRepoByName(p.repoName)
 	}
@@ -226,32 +225,40 @@ func (p *pushCmd) push() error {
 			return err
 		}
 		if fi.IsDir() {
-			if validChart, err := chartutil.IsChartDir(name); !validChart {
-				return err
+			var validChart bool
+			var chartutilErr error
+
+			if helm.HelmMajorVersionCurrent() == helm.HelmMajorVersion3 {
+				validChart, chartutilErr = v3chartutil.IsChartDir(name)
+			} else {
+				validChart, chartutilErr = v4chartutil.IsChartDir(name)
 			}
+
+			if !validChart {
+				return chartutilErr
+			}
+
 			chartPath, err := filepath.Abs(p.chartName)
 			if err != nil {
 				return err
 			}
-			if helm.HelmMajorVersionCurrent() == helm.HelmMajorVersion2 {
-				v2downloadManager := &v2downloader.Manager{
+
+			if helm.HelmMajorVersionCurrent() == helm.HelmMajorVersion3 {
+				downloadManager := &v3downloader.Manager{
 					Out:       p.out,
 					ChartPath: chartPath,
-					HelmHome:  v2settings.Home,
 					Keyring:   p.keyring,
-					Getters:   v2getter.All(v2settings),
-					Debug:     v2settings.Debug,
+					Getters:   v3getter.All(v3settings),
 				}
-				if err := v2downloadManager.Update(); err != nil {
+				if err := downloadManager.Update(); err != nil {
 					return err
 				}
 			} else {
-				downloadManager := &downloader.Manager{
+				downloadManager := &v4downloader.Manager{
 					Out:       p.out,
 					ChartPath: chartPath,
 					Keyring:   p.keyring,
-					Getters:   getter.All(settings),
-					Debug:     v2settings.Debug,
+					Getters:   v4getter.All(v4settings),
 				}
 				if err := downloadManager.Update(); err != nil {
 					return err
@@ -276,8 +283,8 @@ func (p *pushCmd) push() error {
 	}
 
 	// username/password override(s)
-	username := repo.Config.Username
-	password := repo.Config.Password
+	username := repo.GetConfigUsername()
+	password := repo.GetConfigPassword()
 	if p.username != "" {
 		username = p.username
 	}
@@ -293,9 +300,9 @@ func (p *pushCmd) push() error {
 	// in case the repo is stored with cm:// protocol, remove it
 	var url string
 	if p.useHTTP {
-		url = strings.Replace(repo.Config.URL, "cm://", "http://", 1)
+		url = strings.Replace(repo.GetConfigURL(), "cm://", "http://", 1)
 	} else {
-		url = strings.Replace(repo.Config.URL, "cm://", "https://", 1)
+		url = strings.Replace(repo.GetConfigURL(), "cm://", "https://", 1)
 	}
 
 	client, err := cm.NewClient(

@@ -5,14 +5,9 @@ import (
 	"os"
 	"testing"
 
-	"k8s.io/helm/pkg/getter"
-	helm_env "k8s.io/helm/pkg/helm/environment"
-	"k8s.io/helm/pkg/helm/helmpath"
-	"k8s.io/helm/pkg/repo"
-)
-
-var (
-	settings helm_env.EnvSettings
+	"helm.sh/helm/v3/pkg/cli"
+	"helm.sh/helm/v3/pkg/getter"
+	"helm.sh/helm/v3/pkg/repo"
 )
 
 func TestGetRepoByName(t *testing.T) {
@@ -29,23 +24,26 @@ func TestGetRepoByName(t *testing.T) {
 	}
 	defer os.RemoveAll(tmp)
 
-	home := helmpath.Home(tmp)
-	f := repo.NewRepoFile()
+	settings := cli.New()
+	settings.RepositoryConfig = tmp + "/repositories.yaml"
+	settings.RepositoryCache = tmp + "/repository"
 
-	entry := repo.Entry{}
+	f := repo.NewFile()
+
+	entry := &repo.Entry{}
 	entry.Name = "helm-push-test"
 	entry.URL = "http://localhost:8080"
 
-	_, err = repo.NewChartRepository(&entry, getter.All(settings))
+	_, err = repo.NewChartRepository(entry, getter.All(settings))
 	if err != nil {
 		t.Error("unexpected error created test repository", err)
 	}
 
-	f.Update(&entry)
-	os.MkdirAll(home.Repository(), 0777)
-	f.WriteFile(home.RepositoryFile(), 0644)
+	f.Update(entry)
+	os.MkdirAll(tmp, 0777)
+	f.WriteFile(settings.RepositoryConfig, 0644)
 
-	os.Setenv("HELM_HOME", home.String())
+	os.Setenv("HELM_REPOSITORY_CONFIG", settings.RepositoryConfig)
 
 	// Retrieve test repo
 	_, err = GetRepoByName("helm-push-test")
@@ -68,7 +66,7 @@ func TestTempRepoFromURL(t *testing.T) {
 	if err != nil {
 		t.Error("unexpected error getting temp repo from URL", err)
 	}
-	if repo.Config.URL != url {
+	if repo.GetConfigURL() != url {
 		t.Error("expecting repo URL to match what was provided")
 	}
 
@@ -77,13 +75,13 @@ func TestTempRepoFromURL(t *testing.T) {
 	if err != nil {
 		t.Error("unexpected error getting temp repo from URL, with basic auth", err)
 	}
-	if repo.Config.URL != "https://my.chart.repo.com/a/b/c/" {
+	if repo.GetConfigURL() != "https://my.chart.repo.com/a/b/c/" {
 		t.Error("expecting repo URL to have basic auth removed")
 	}
-	if repo.Config.Username != "user" {
+	if repo.GetConfigUsername() != "user" {
 		t.Error("expecting repo username to be extracted from URL")
 	}
-	if repo.Config.Password != "p@ss" {
+	if repo.GetConfigPassword() != "p@ss" {
 		t.Error("expecting repo password to be extracted from URL")
 	}
 }
