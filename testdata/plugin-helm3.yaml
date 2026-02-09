@@ -7,7 +7,6 @@ downloaders:
   - command: "bin/helm-cm-push"
     protocols:
       - "cm"
-useTunnel: false
 hooks:
   install: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"
   update: "cd $HELM_PLUGIN_DIR; scripts/install_plugin.sh"
